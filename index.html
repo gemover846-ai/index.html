@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Симулятор бомжа — финал</title>
+<style>
+  :root{--bg:#16161c;--panel:#23232c;--text:#eaeaf0;--muted:#9a9aa8;
+  --gold:#ffd700;--food:#e67e22;--energy:#3498db;--health:#e74c3c;--mood:#9b59b6;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:radial-gradient(circle at 50% -10%,#2c2c3a,var(--bg) 60%);
+  color:var(--text);margin:0;padding:12px 12px 50px;text-align:center;min-height:100vh;overflow-x:hidden}
+  h1{font-size:20px;margin:4px 0 2px;letter-spacing:.4px}
+  .sub{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .money{font-size:28px;color:var(--gold);font-weight:800;margin:6px 0;
+  text-shadow:0 0 14px rgba(255,215,0,.4);transition:transform .15s}
+  .money.bump{transform:scale(1.14)}
+  .topline{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:2px 4px 8px}
+  .stat{margin:3px 0}
+  .stat-label{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;padding:0 3px}
+  .bar{background:#353540;border-radius:10px;height:15px;margin:2px 0 7px;overflow:hidden;position:relative}
+  .bar div{height:100%;transition:width .35s ease;border-radius:10px}
+  .bar.food div{background:linear-gradient(90deg,#e67e22,#f39c12)}
+  .bar.energy div{background:linear-gradient(90deg,#2980b9,#3498db)}
+  .bar.health div{background:linear-gradient(90deg,#c0392b,#e74c3c)}
+  .bar.mood div{background:linear-gradient(90deg,#8e44ad,#9b59b6)}
+  .bar.low div{animation:pulse 1s infinite}
+  .bar .glow{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+  animation:shine 2.5s infinite;pointer-events:none}
+  button{background:linear-gradient(180deg,#45454f,#343440);color:var(--text);border:none;border-radius:12px;
+  padding:11px 12px;margin:4px 3px;font-size:14px;font-weight:600;cursor:pointer;
+  box-shadow:0 2px 0 #0d0d12,0 5px 14px rgba(0,0,0,.35);
+  transition:transform .08s,box-shadow .08s,background .2s;width:calc(50% - 8px);max-width:230px;
+  position:relative;overflow:hidden}
+  button:active{transform:translateY(2px);box-shadow:0 0 0 #0d0d12;background:#555}
+  button:disabled{opacity:.4}
+  button .rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);
+  transform:scale(0);animation:rip .5s ease-out;pointer-events:none}
+  .shop button{background:linear-gradient(180deg,#2d6a4f,#1c4a35)}
+  .shop button:active{background:#2d6a4f}
+  .shop button.owned{background:linear-gradient(180deg,#3a3a48,#2a2a35);opacity:.7}
+  .danger{background:linear-gradient(180deg,#7a2e2e,#541b1b)!important}
+  h3{font-size:13px;margin:14px 0 4px;color:var(--muted);font-weight:600;letter-spacing:.5px}
+  .log{font-size:12px;color:var(--muted);height:120px;overflow-y:auto;margin-top:10px;text-align:left;
+  background:var(--panel);border-radius:12px;padding:9px;border:1px solid #333}
+  .log div{animation:slideIn .25s ease;padding:2px 0;border-bottom:1px solid #2a2a34;word-break:break-word}
+  .log div:last-child{border-bottom:none}
+  .ach{font-size:12px;color:var(--gold);margin-top:8px;font-weight:600}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(120px);
+  background:#2f2f3a;color:#fff;padding:9px 15px;border-radius:20px;font-size:13px;opacity:0;
+  transition:all .3s ease;z-index:120;pointer-events:none;max-width:92%;box-shadow:0 6px 24px rgba(0,0,0,.6)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .float{position:fixed;font-weight:800;font-size:17px;pointer-events:none;
+  animation:floatUp .95s ease forwards;z-index:110;text-shadow:0 2px 6px rgba(0,0,0,.7)}
+  @keyframes floatUp{to{transform:translateY(-70px);opacity:0}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+  @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  @keyframes rip{to{transform:scale(3);opacity:0}}
+  @media(min-width:620px){button{width:auto}}
+</style>
+</head>
+<body>
+<h1>🚬 Симулятор бомжа</h1>
+<div class="sub">финальная версия</div>
+<div class="money" id="moneyEl">💰 <span id="money">0</span></div>
+<div class="topline"><span id="dayTxt">📅 День 1</span><span id="wonTxt"></span></div>
+
+<div class="stat"><div class="stat-label"><span>🍞 Голод</span><span id="foodTxt">100</span></div>
+<div class="bar food" id="foodBarWrap"><div id="foodBar" style="width:100%"></div><div class="glow"></div></div></div>
+<div class="stat"><div class="stat-label"><span>⚡ Энергия</span><span id="energyTxt">100</span></div>
+<div class="bar energy" id="energyBarWrap"><div id="energyBar" style="width:100%"></div><div class="glow"></div></div></div>
+<div class="stat"><div class="stat-label"><span>❤️ Здоровье</span><span id="healthTxt">100</span></div>
+<div class="bar health" id="healthBarWrap"><div id="healthBar" style="width:100%"></div><div class="glow"></div></div></div>
+<div class="stat"><div class="stat-label"><span>😊 Настроение</span><span id="moodTxt">100</span></div>
+<div class="bar mood" id="moodBarWrap"><div id="moodBar" style="width:100%"></div><div class="glow"></div></div></div>
+
+<button type="button" onclick="beg(event)">🙏 Милостыня</button>
+<button type="button" onclick="work(event)">🧹 Помыть машину (-20⚡)</button>
+<button type="button" onclick="dumpster(event)">🗑 Мусорка (-10⚡)</button>
+<button type="button" onclick="sleepStreet(event)">🌙 Поспать на улице</button>
+<button type="button" onclick="pray(event)">🙏 Помолиться</button>
+<button type="button" onclick="sing(event)">🎤 Споеть песню</button>
+<button type="button" class="danger" onclick="resetGame(event)">🔄 Сброс</button>
+
+<h3>🛒 Магазин</h3>
+<div class="shop" id="shop"></div>
+
+<div class="log" id="log"></div>
+<div class="ach" id="achList"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- утилиты ---------- */
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+function clamp(v){v=Number(v);if(!Number.isFinite(v))return 0;return Math.max(0,Math.min(100,v))}
+function clampMoney(v){v=Number(v);if(!Number.isFinite(v))return 0;return Math.max(0,Math.floor(v))}
+
+/* ---------- состояние ---------- */
+let s={};
+try{const raw=lsGet('bomzh');if(raw){const p=JSON.parse(raw);if(p&&typeof p==='object')s=p}}catch(e){s={}}
+let money=clampMoney(s.money??0);
+let food=clamp(s.food??100);
+let energy=clamp(s.energy??100);
+let health=clamp(s.health??100);
+let mood=clamp(s.mood??100);
+let won=s.won??false;
+let ach={};
+if(s.ach&&typeof s.ach==='object'){
+  Object.keys(s.ach).forEach(k=>{if(ACH_KEYS.includes(k))ach[k]=s.ach[k]});
+}
+let days=Number.isFinite(s.days)?s.days:1;
+let busy=false;
+let tickCount=0;
+
+const ACH_KEYS=['first1000','win','rich','rich2','rich3','lowhp','hungry','tired','sad',
+'week','month','dressed','online','home','worker','healthy','fed','rested','happy','all'];
+
+function save(){lsSet('bomzh',JSON.stringify({money,food,energy,health,mood,won,ach,days}))}
+
+/* ---------- лог/тост/всплывашки ---------- */
+function log(msg){
+  const l=document.getElementById('log');
+  const d=document.createElement('div');
+  d.textContent=String(msg).slice(0,160);
+  l.prepend(d);
+  while(l.children.length>80)l.removeChild(l.lastChild);
+}
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=String(msg).slice(0,120);
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1700);
+}
+function floatText(txt,color,ev){
+  const el=document.createElement('div');
+  el.className='float';el.textContent=txt;
+  if(color)el.style.color=color;
+  let x=window.innerWidth/2,y=window.innerHeight/2;
+  if(ev&&ev.currentTarget&&ev.currentTarget.getBoundingClientRect){
+    const r=ev.currentTarget.getBoundingClientRect();
+    x=r.left+r.width/2-14;y=r.top-4;
+  }
+  el.style.left=x+'px';el.style.top=y+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+function ripple(ev){
+  const b=ev&&ev.currentTarget;if(!b)return;
+  const r=document.createElement('span');r.className='rip';
+  const rect=b.getBoundingClientRect();
+  const size=Math.max(rect.width,rect.height);
+  r.style.width=r.style.height=size+'px';
+  r.style.left=(ev.clientX-rect.left-size/2)+'px';
+  r.style.top=(ev.clientY-rect.top-size/2)+'px';
+  b.appendChild(r);setTimeout(()=>r.remove(),520);
+}
+
+/* ---------- магазин ---------- */
+const SHOP=[
+  {id:'food',label:'🍞 Еда',price:20},
+  {id:'energy',label:'☕ Кофе',price:15},
+  {id:'sleep',label:'🛏 Ночлег',price:50},
+  {id:'health',label:'💊 Аптечка',price:40},
+  {id:'soup',label:'🍲 Суп',price:30},
+  {id:'bread',label:'🥖 Хлеб',price:10},
+  {id:'energy2',label:'🍫 Шоколад',price:25},
+  {id:'clothes',label:'👕 Одежда',price:300,once:true},
+  {id:'phone',label:'📱 Телефон',price:500,once:true},
+  {id:'tent',label:'⛺ Палатка',price:800,once:true},
+  {id:'job',label:'💼 Работа',price:1000,once:true}
+];
+function renderShop(){
+  const box=document.getElementById('shop');
+  box.innerHTML='';
+  SHOP.forEach(it=>{
+    const b=document.createElement('button');
+    b.type='button';
+    const owned=it.once&&ach[it.id];
+    b.textContent=it.label+(owned?' ✓':'')+' ('+it.price+')';
+    if(owned)b.classList.add('owned');
+    b.onclick=(e)=>{ripple(e);buy(it.id,it.price,e)};
+    box.appendChild(b);
+  });
+}
+
+/* ---------- рендер ---------- */
+function render(){
+  food=clamp(food);energy=clamp(energy);health=clamp(health);mood=clamp(mood);money=clampMoney(money);
+  document.getElementById('money').textContent=money;
+  document.getElementById('foodTxt').textContent=Math.floor(food);
+  document.getElementById('energyTxt').textContent=Math.floor(energy);
+  document.getElementById('healthTxt').textContent=Math.floor(health);
+  document.getElementById('moodTxt').textContent=Math.floor(mood);
+  document.getElementById('dayTxt').textContent='📅 День '+days;
+  document.getElementById('wonTxt').textContent=won?'🏆 Победа':'';
+  setBar('foodBar','foodBarWrap',food);
+  setBar('energyBar','energyBarWrap',energy);
+  setBar('healthBar','healthBarWrap',health);
+  setBar('moodBar','moodBarWrap',mood);
+  const cnt=ACH_KEYS.filter(k=>k!=='all'&&ach[k]).length;
+  document.getElementById('achList').textContent='🏅 Ачивки: '+cnt+'/20';
+  save();
+}
+function setBar(id,wrapId,val){
+  const bar=document.getElementById(id);bar.style.width=val+'%';
+  const wrap=document.getElementById(wrapId);
+  if(val<=20)wrap.classList.add('low');else wrap.classList.remove('low');
+}
+function bumpMoney(){
+  const el=document.getElementById('moneyEl');
+  el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),160);
+}
+
+/* ---------- ачивки ---------- */
+function grantAch(key,text){
+  if(ach[key])return;
+  ach[key]=true;log(text);toast(text);
+  checkAch();
+}
+function checkAch(){
+  if(ach.all)return;
+  const cnt=ACH_KEYS.filter(k=>k!=='all'&&ach[k]).length;
+  if(cnt>=20){ach.all=true;log('🏆 Все ачивки собраны!');toast('🏆 Все ачивки!')}
+}
+function checkStatsAch(){
+  if(money>=1000)grantAch('first1000','🏅 Первая тысяча!');
+  if(money>=5000)grantAch('win','🏅 Выбрался с улицы!');
+  if(money>=10000)grantAch('rich','🏅 10 000 монет!');
+  if(money>=50000)grantAch('rich2','🏅 50 000 монет!');
+  if(money>=100000)grantAch('rich3','🏅 100 000 монет!');
+  if(health<=20)grantAch('lowhp','🏅 На грани.');
+  if(food<=10)grantAch('hungry','🏅 Голодный день.');
+  if(energy<=10)grantAch('tired','🏅 Без сил.');
+  if(mood<=10)grantAch('sad','🏅 На дне.');
+  if(days>=7)grantAch('week','🏅 Неделя на улице.');
+  if(days>=30)grantAch('month','🏅 Месяц выживания.');
+  if(ach.clothes)grantAch('dressed','🏅 Одёт по-человечески.');
+  if(ach.phone)grantAch('online','🏅 Снова онлайн.');
+  if(ach.tent)grantAch('home','🏅 Есть крыша.');
+  if(ach.job)grantAch('worker','🏅 Вернулся к работе.');
+  if(health>=100)grantAch('healthy','🏅 Полное здоровье.');
+  if(food>=100)grantAch('fed','🏅 Сыт.');
+  if(energy>=100)grantAch('rested','🏅 Отдохнул.');
+  if(mood>=100)grantAch('happy','🏅 Счастлив.');
+}
+
+/* ---------- события ---------- */
+function randomEvent(){
+  const r=Math.random();
+  if(r<0.05){money=clampMoney(money+100);floatText('+100','#ffd700');log('🍀 Нашёл кошелёк! +100 монет.');bumpMoney()}
+  else if(r<0.10){health=clamp(health-10);floatText('-10 ❤','#e74c3c');log('👊 Отобрали мелочь и побили.')}
+  else if(r<0.15){food=clamp(food+20);floatText('+20 🍞','#e67e22');log('🥪 Добрый прохожий дал бутерброд.')}
+  else if(r<0.20){energy=clamp(energy-15);floatText('-15 ⚡','#3498db');log('🌧 Пошёл дождь, продрог.')}
+  else if(r<0.25){mood=clamp(mood-10);floatText('-10 😞','#9b59b6');log('😞 Кто-то обозвал.')}
+  else if(r<0.30){money=clampMoney(money+50);floatText('+50','#ffd700');log('🎁 Кто-то оставил пакет с едой и мелочью.');bumpMoney()}
+  else if(r<0.35){health=clamp(health+10);floatText('+10 ❤','#2ecc71');log('💊 Нашёл аптечку.')}
+  else if(r<0.40){energy=clamp(energy+20);floatText('+20 ⚡','#3498db');log('☕ Добрый бариста налил кофе.')}
+  else if(r<0.45){mood=clamp(mood+15);floatText('+15 😊','#9b59b6');log('😊 Ребёнок улыбнулся.')}
+  else if(r<0.50){money=clampMoney(money-20);floatText('-20','#e74c3c');log('💸 Оштрафовали.');bumpMoney()}
+}
+
+/* ---------- guard ---------- */
+function guard(fn,ev){
+  if(busy)return;
+  busy=true;
+  const b=ev&&ev.currentTarget;
+  if(b){b.disabled=true;ripple(ev)}
+  try{fn()}finally{setTimeout(()=>{busy=false;if(b)b.disabled=false},180)}
+}
+
+/* ---------- действия ---------- */
+function beg(ev){guard(()=>{
+  if(energy<5){log('Нет сил просить. Нужен отдых.');return}
+  const r=Math.random();let got=0;
+  if(r<0.5)got=Math.floor(Math.random()*5)+1;
+  else if(r<0.8)got=Math.floor(Math.random()*15)+5;
+  else if(r<0.95)got=Math.floor(Math.random()*30)+15;
+  else{log('Тебе дали 0. Прохожий отвернулся.');energy=clamp(energy-5);render();return}
+  const bonus=ach.clothes?1.5:1;
+  got=Math.floor(got*bonus);
+  money=clampMoney(money+got);energy=clamp(energy-5);mood=clamp(mood-2);
+  floatText('+'+got,'#ffd700',ev);bumpMoney();
+  log('Ты получил '+got+' монет.');
+  if(money>=5000&&!won){won=true;log('🏆 Ты накопил 5000 и выбрался с улицы. Победа!');toast('🏆 Победа!')}
+  randomEvent();render();
+},ev)}
+
+function work(ev){guard(()=>{
+  if(energy<20){log('Слишком устал работать.');return}
+  const pay=Math.floor(Math.random()*40)+20;
+  money=clampMoney(money+pay);energy=clamp(energy-20);mood=clamp(mood-5);
+  floatText('+'+pay,'#ffd700',ev);bumpMoney();
+  log('Поработал. Заработал '+pay+' монет.');render();
+},ev)}
+
+function dumpster(ev){guard(()=>{
+  if(energy<10){log('Нет сил рыться.');return}
+  energy=clamp(energy-10);
+  const r=Math.random();
+  if(r<0.3){food=clamp(food+25);floatText('+25 🍞','#e67e22',ev);log('🍞 Нашёл еду.')}
+  else if(r<0.5){money=clampMoney(money+15);floatText('+15','#ffd700',ev);log('💰 Нашёл мелочь.');bumpMoney()}
+  else if(r<0.7){health=clamp(health-5);floatText('-5 ❤','#e74c3c',ev);log('🤢 Что-то испортило здоровье.')}
+  else{log('Ничего не нашёл.')}
+  render();
+},ev)}
+
+function sleepStreet(ev){guard(()=>{
+  if(energy>=100){log('Ты и так бодр.');return}
+  energy=clamp(energy+40);health=clamp(health-10);mood=clamp(mood-10);
+  floatText('+40 ⚡','#3498db',ev);
+  log('Поспал на улице. Энергия +40, здоровье -10.');render();
+},ev)}
+
+function pray(ev){guard(()=>{
+  if(energy<5){log('Нет сил.');return}
+  energy=clamp(energy-5);
+  if(Math.random()<0.3){mood=clamp(mood+20);floatText('+20 😊','#9b59b6',ev);log('🙏 Стало легче на душе.')}
+  else{log('🙏 Ничего не произошло.')}
+  render();
+},ev)}
+
+function sing(ev){guard(()=>{
+  if(energy<10){log('Нет сил петь.');return}
+  energy=clamp(energy-10);
+  const earned=Math.floor(Math.random()*25)+5;
+  money=clampMoney(money+earned);mood=clamp(mood+10);
+  floatText('+'+earned,'#ffd700',ev);bumpMoney();
+  log('🎤 Ты спел и получил '+earned+' монет.');render();
+},ev)}
+
+function buy(type,price,ev){guard(()=>{
+  if(money<price){log('Не хватает монет.');toast('Не хватает монет');return}
+  const once=['clothes','phone','tent','job'];
+  if(once.includes(type)&&ach[type]){log('Уже куплено.');toast('Уже куплено');return}
+  money=clampMoney(money-price);bumpMoney();
+  if(type==='food'){food=clamp(food+30);log('Поел. Голод снизился.')}
+  if(type==='energy'){energy=clamp(energy+40);log('Выпил кофе. Энергия выросла.')}
+  if(type==='sleep'){energy=clamp(energy+60);health=clamp(health+10);log('Поспал в ночлежке.')}
+  if(type==='health'){health=clamp(health+40);log('Подлечился.')}
+  if(type==='soup'){food=clamp(food+45);health=clamp(health+10);log('Съел суп. Тепло и сытно.')}
+  if(type==='bread'){food=clamp(food+15);log('Съел хлеб.')}
+  if(type==='energy2'){food=clamp(food+10);energy=clamp(energy+25);log('Шоколад взбодрил.')}
+  if(type==='clothes'){ach.clothes=true;log('Купил одежду. Теперь подают чаще.')}
+  if(type==='phone'){ach.phone=true;mood=clamp(mood+20);log('Купил телефон. Снова на связи.')}
+  if(type==='tent'){ach.tent=true;energy=clamp(energy+20);log('Купил палатку. Теперь есть крыша.')}
+  if(type==='job'){ach.job=true;money=clampMoney(money+50);log('Устроился на работу. +50 монет сразу.')}
+  renderShop();render();
+},ev)}
+
+function resetGame(ev){guard(()=>{
+  try{lsDel('bomzh')}catch(e){}
+  location.reload();
+},ev)}
+
+/* ---------- таймеры ---------- */
+setInterval(()=>{
+  food=clamp(food-1);
+  energy=clamp(energy-0.5);
+  mood=clamp(mood-0.3);
+  if(food<=0)health=clamp(health-2);
+  if(health<=0){
+    money=0;food=100;energy=100;health=100;mood=100;
+    log('💀 Ты потерял сознание. Тебя обобрали. Начинаешь заново.');
+    toast('💀 Тебя обобрали!');
+  }
+  tickCount++;
+  if(tickCount%12===0){days+=1;log('📅 День '+days+'.')}
+  render();
+  checkStatsAch();
+},10000);
+
+/* ---------- старт ---------- */
+renderShop();
+render();
+checkStatsAch();
+log('Игра началась. Проси милостыню и выживай.');
+</script>
+</body>
+  </html>
