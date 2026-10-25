@@ -5,56 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0d0d11">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" content="Симулятор бомжа — выживай, богатей, становись легендой улиц!">
-<title>Симулятор Бомжа</title>
+<title>Симулятор Бомжа — v8.0 CITY LIFE</title>
 <link rel="manifest" href="manifest.json">
 <style>
   :root {
     --bg: #0d0d11; --panel: #181820; --panel2: #222230; --text: #f0f0f5; --muted: #8b8b9a;
     --gold: #ffd700; --food: #e67e22; --energy: #3498db; --health: #e74c3c;
-    --mood: #9b59b6; --accent: #00d2ff; --disease: #2ecc71; --danger: #e74c3c; --success: #2ecc71;
+    --mood: #9b59b6; --accent: #00d2ff; --disease: #2ecc71; --water: #00bcd4; --rep: #ff9800;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   body.light { --bg: #f4f4f9; --panel: #ffffff; --panel2: #f0f0f5; --text: #111; --muted: #666; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  body { 
-    background: radial-gradient(circle at 50% -10%, var(--panel), var(--bg) 70%); 
-    color: var(--text); margin: 0; 
-    padding: calc(10px + var(--safe-top)) 10px calc(80px + var(--safe-bottom)); 
-    text-align: center; min-height: 100vh; transition: background .3s; 
-    -webkit-user-select: none; -webkit-touch-callout: none;
-  }
+  body { background: radial-gradient(circle at 50% -10%, var(--panel), var(--bg) 70%); color: var(--text); margin: 0; padding: calc(10px + var(--safe-top)) 10px calc(80px + var(--safe-bottom)); text-align: center; min-height: 100vh; transition: background .3s; }
   h1 { font-size: 18px; margin: 4px 0; text-shadow: 0 2px 4px rgba(0,0,0,.5); display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
-  .tab-bar { display: flex; justify-content: center; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
-  .tab-btn { background: var(--panel); color: var(--muted); border: 1px solid #333; border-radius: 20px; padding: 8px 12px; font-size: 12px; font-weight: bold; cursor: pointer; transition: .2s; }
+  .tab-bar { display: flex; justify-content: center; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tab-btn { background: var(--panel); color: var(--muted); border: 1px solid #333; border-radius: 20px; padding: 6px 10px; font-size: 11px; font-weight: bold; cursor: pointer; transition: .2s; }
   .tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 10px var(--accent); }
   .tab-content { display: none; animation: fadeIn .3s; }
   .tab-content.active { display: block; }
-  .money { font-size: 30px; color: var(--gold); font-weight: 900; margin: 5px 0; text-shadow: 0 0 15px rgba(255,215,0,.4); transition: transform .15s; }
+  .money { font-size: 28px; color: var(--gold); font-weight: 900; margin: 5px 0; text-shadow: 0 0 15px rgba(255,215,0,.4); transition: transform .15s; }
   .money.bump { transform: scale(1.1); }
-  .topline { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin: 0 5px 10px; font-weight: bold; }
-  .stat { margin: 4px 0; }
+  .topline { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin: 0 5px 8px; font-weight: bold; }
+  .stat { margin: 3px 0; }
   .stat-label { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; padding: 0 4px; font-weight: bold; }
-  .bar { background: #222; border-radius: 8px; height: 12px; margin: 2px 0 6px; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,.6); }
+  .bar { background: #222; border-radius: 8px; height: 10px; margin: 1px 0 5px; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,.6); }
   .bar div { height: 100%; transition: width .3s ease; border-radius: 8px; }
   .bar.food div { background: linear-gradient(90deg, #d35400, #e67e22); }
   .bar.energy div { background: linear-gradient(90deg, #2980b9, #3498db); }
   .bar.health div { background: linear-gradient(90deg, #c0392b, #e74c3c); }
   .bar.mood div { background: linear-gradient(90deg, #8e44ad, #9b59b6); }
+  .bar.water div { background: linear-gradient(90deg, #00838f, #00bcd4); }
+  .bar.rep div { background: linear-gradient(90deg, #e65100, #ff9800); }
   .bar.disease div { background: linear-gradient(90deg, #27ae60, #2ecc71); }
   .bar.low div { animation: pulse 1s infinite; }
-  button { background: linear-gradient(180deg, #2e2e38, #22222a); color: var(--text); border: 1px solid #444; border-radius: 10px; padding: 12px 10px; margin: 4px 2px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #000; transition: transform .08s; width: calc(50% - 6px); position: relative; overflow: hidden; }
+  button { background: linear-gradient(180deg, #2e2e38, #22222a); color: var(--text); border: 1px solid #444; border-radius: 10px; padding: 10px; margin: 3px 2px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #000; transition: transform .08s; width: calc(50% - 6px); position: relative; overflow: hidden; }
   body.light button { background: #ddd; color: #000; border-color: #ccc; box-shadow: 0 3px 0 #bbb; }
   button:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
   button:disabled { opacity: .5; box-shadow: none; transform: none; cursor: not-allowed; }
   .shop button { background: linear-gradient(180deg, #1e8449, #145a32); border-color: #2ecc71; color: #fff; }
+  .loc-btn { background: linear-gradient(180deg, #2980b9, #1c5980); border-color: #3498db; color: #fff; width: 100%; margin: 4px 0; }
+  .loc-btn.active { background: linear-gradient(180deg, #f39c12, #d35400); border-color: #f1c40f; }
   .danger { background: linear-gradient(180deg, #922b21, #641e16) !important; color: #fff !important; border-color: #e74c3c !important; }
   .success { background: linear-gradient(180deg, #1e8449, #145a32) !important; color: #fff !important; border-color: #2ecc71 !important; }
-  h3 { font-size: 12px; margin: 12px 0 4px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  .log { font-size: 12px; color: var(--muted); height: 100px; overflow-y: auto; margin-top: 10px; text-align: left; background: var(--panel); border-radius: 10px; padding: 8px; border: 1px solid #333; }
-  .log div { animation: slideIn .2s ease; padding: 3px 0; border-bottom: 1px solid #2a2a34; }
+  h3 { font-size: 12px; margin: 10px 0 3px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .log { font-size: 11px; color: var(--muted); height: 90px; overflow-y: auto; margin-top: 10px; text-align: left; background: var(--panel); border-radius: 10px; padding: 6px; border: 1px solid #333; }
+  .log div { animation: slideIn .2s ease; padding: 2px 0; border-bottom: 1px solid #2a2a34; }
   body.light .log div { border-bottom: 1px solid #eee; }
   .toast { position: fixed; bottom: calc(20px + var(--safe-bottom)); left: 50%; transform: translateX(-50%) translateY(120px); background: #111; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 14px; font-weight: bold; opacity: 0; transition: all .3s cubic-bezier(0.175,0.885,0.32,1.275); z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,.6); border: 1px solid #333; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -70,13 +66,11 @@
   input:checked + .slider:before { transform: translateX(20px); }
   .setting-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 8px; }
   .close-btn { width: 100%; margin-top: 15px; background: #444; color: #fff; padding: 12px; border-radius: 10px; font-size: 15px; border: none; font-weight: bold; }
-  .pet-box { background: #2c3e50; padding: 10px; border-radius: 10px; margin: 10px 0; border: 1px solid #34495e; display: none; text-align: left; font-size: 13px; }
-  .pet-box.active { display: block; }
   .ach-item { display: inline-block; background: #222; border: 1px solid #333; padding: 4px 8px; border-radius: 8px; font-size: 11px; margin: 2px; color: #555; transition: .3s; }
   .ach-item.unlocked { color: #ffd700; border-color: #ffd700; box-shadow: 0 0 5px rgba(255,215,0,.3); }
-  .item-card { background: var(--panel2); padding: 10px; border-radius: 10px; margin-bottom: 8px; text-align: left; border-left: 4px solid var(--accent); }
-  .item-card h4 { margin: 0 0 4px 0; font-size: 14px; }
-  .item-card p { margin: 0; font-size: 12px; color: var(--muted); }
+  .item-card { background: var(--panel2); padding: 10px; border-radius: 10px; margin-bottom: 6px; text-align: left; border-left: 4px solid var(--accent); }
+  .item-card h4 { margin: 0 0 4px 0; font-size: 13px; }
+  .item-card p { margin: 0; font-size: 11px; color: var(--muted); }
   @keyframes floatUp { to { transform: translateY(-60px); opacity: 0; } }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
   @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
@@ -84,33 +78,36 @@
 </style>
 </head>
 <body>
-<h1>🚬 Бомж v6.1 <span id="lvlBadge" style="font-size:12px;color:var(--accent)">Ур. 1</span></h1>
+<h1>🚬 Бомж v8.0 <span id="lvlBadge" style="font-size:12px;color:var(--accent)">Ур. 1</span></h1>
 
 <div class="tab-bar">
   <div class="tab-btn active" onclick="switchTab('main', this)">🏠 Город</div>
+  <div class="tab-btn" onclick="switchTab('map', this)">🗺️ Карта</div>
   <div class="tab-btn" onclick="switchTab('shop', this)">🛒 Магазин</div>
+  <div class="tab-btn" onclick="switchTab('upgrades', this)">💪 Прокачка</div>
   <div class="tab-btn" onclick="switchTab('bank', this)">🏦 Банк</div>
-  <div class="tab-btn" onclick="switchTab('dungeon', this)">⚔️ Подземелья</div>
   <div class="tab-btn" onclick="switchTab('casino', this)">🎰 Казино</div>
-  <div class="tab-btn" onclick="switchTab('pet', this)">🐕 Питомец</div>
 </div>
 
 <!-- Вкладка Город -->
 <div id="tab-main" class="tab-content active">
   <div class="money" id="moneyEl">💰 <span id="money">0</span></div>
-  <div class="topline"><span id="dayTxt">📅 День 1</span><span id="weatherTxt">☀️ Ясно</span></div>
+  <div class="topline"><span id="dayTxt">📅 День 1</span><span id="timeTxt">☀️ День</span></div>
+  <div class="topline"><span id="weatherTxt">☀️ Ясно</span><span id="locTxt" style="color:var(--accent)">📍 Улица</span></div>
   
   <div class="stat"><div class="stat-label"><span>🍞 Голод</span><span id="foodTxt">100</span></div><div class="bar food"><div id="foodBar" style="width:100%"></div></div></div>
+  <div class="stat"><div class="stat-label"><span>💧 Жажда</span><span id="waterTxt">100</span></div><div class="bar water"><div id="waterBar" style="width:100%"></div></div></div>
   <div class="stat"><div class="stat-label"><span>⚡ Энергия</span><span id="energyTxt">100</span></div><div class="bar energy"><div id="energyBar" style="width:100%"></div></div></div>
   <div class="stat"><div class="stat-label"><span>❤️ Здоровье</span><span id="healthTxt">100</span></div><div class="bar health"><div id="healthBar" style="width:100%"></div></div></div>
   <div class="stat"><div class="stat-label"><span>😊 Настроение</span><span id="moodTxt">100</span></div><div class="bar mood"><div id="moodBar" style="width:100%"></div></div></div>
+  <div class="stat"><div class="stat-label"><span>🔥 Репутация</span><span id="repTxt">0</span></div><div class="bar rep"><div id="repBar" style="width:0%"></div></div></div>
   <div class="stat" id="diseaseStat" style="display:none"><div class="stat-label"><span>🤒 Болезнь</span><span id="diseaseTxt">0</span></div><div class="bar disease"><div id="diseaseBar" style="width:0%"></div></div></div>
 
   <button type="button" onclick="beg(event)">🙏 Милостыня</button>
   <button type="button" onclick="work(event)">🧹 Работа</button>
+  <button type="button" onclick="sleepStreet(event)">🌙 Поспать</button>
   <button type="button" onclick="dumpster(event)">🗑 Мусорка</button>
   <button type="button" onclick="scavenge(event)">♻️ Бутылки</button>
-  <button type="button" onclick="gangFight(event)">🥊 Гоп-стоп</button>
   <button type="button" onclick="sing(event)">🎤 Споеть</button>
   
   <h3>📋 Ежедневный квест</h3>
@@ -121,9 +118,26 @@
   </div>
 
   <h3>Активные эффекты</h3>
-  <div id="buffsBox" style="font-size:12px;color:var(--accent)">Нет эффектов</div>
+  <div id="buffsBox" style="font-size:11px;color:var(--accent)">Нет эффектов</div>
   
   <div class="log" id="log"></div>
+</div>
+
+<!-- Вкладка Карта -->
+<div id="tab-map" class="tab-content">
+  <h3>🗺️ Выбери локацию</h3>
+  <button type="button" class="loc-btn active" id="loc-street" onclick="changeLoc('street', event)">🏙 Улица (Старт)</button>
+  <button type="button" class="loc-btn" id="loc-station" onclick="changeLoc('station', event)">🚉 Вокзал (Много людей)</button>
+  <button type="button" class="loc-center" onclick="changeLoc('center', event)">🏢 Центр (Богачи)</button>
+  <button type="button" class="loc-btn" id="loc-industrial" onclick="changeLoc('industrial', event)">🏭 Промзона (Металл)</button>
+  <button type="button" class="loc-btn" id="loc-forest" onclick="changeLoc('forest', event)">🌲 Лесополоса (Природа)</button>
+  
+  <h3>🏠 Жилье</h3>
+  <div class="item-card">
+    <h4>Текущее жилье: <span id="houseName">Улица</span></h4>
+    <p>Влияет на восстановление энергии во время сна.</p>
+    <button type="button" class="success" style="width:100%" onclick="buyHouse(event)">Купить/Улучшить (Цена: <span id="houseCost">1000</span>)</button>
+  </div>
 </div>
 
 <!-- Вкладка Магазин -->
@@ -134,6 +148,26 @@
   <div class="shop" id="shop-upgrades"></div>
   <h3>Крафт и Сдача</h3>
   <div class="shop" id="shop-craft"></div>
+</div>
+
+<!-- Вкладка Прокачка -->
+<div id="tab-upgrades" class="tab-content">
+  <h3>💪 Твои характеристики</h3>
+  <div class="item-card">
+    <h4>🥊 Сила (Уровень: <span id="strLvl">1</span>)</h4>
+    <p>Увеличивает урон в драках и шанс победы.</p>
+    <button type="button" class="success" style="width:100%" onclick="upgradeStat('str', event)">Прокачать (Цена: <span id="strCost">500</span>)</button>
+  </div>
+  <div class="item-card">
+    <h4>🍀 Удача (Уровень: <span id="luckLvl">1</span>)</h4>
+    <p>Увеличивает шанс выигрыша в казино и находки денег.</p>
+    <button type="button" class="success" style="width:100%" onclick="upgradeStat('luck', event)">Прокачать (Цена: <span id="luckCost">500</span>)</button>
+  </div>
+  <div class="item-card">
+    <h4>🏃 Выносливость (Уровень: <span id="endLvl">1</span>)</h4>
+    <p>Уменьшает расход энергии при работе и действиях.</p>
+    <button type="button" class="success" style="width:100%" onclick="upgradeStat('end', event)">Прокачать (Цена: <span id="endCost">500</span>)</button>
+  </div>
 </div>
 
 <!-- Вкладка Банк -->
@@ -157,21 +191,6 @@
   </div>
 </div>
 
-<!-- Вкладка Подземелья -->
-<div id="tab-dungeon" class="tab-content">
-  <h3>⚔️ Опасные районы</h3>
-  <p style="font-size:12px;color:var(--muted)">Сразись с местными бандитами за деньги и опыт.</p>
-  
-  <div id="dungeonList"></div>
-  
-  <h3>👑 Босс: Смотрящий</h3>
-  <div class="item-card" style="border-color:#e74c3c">
-    <h4>Смотрящий за районом</h4>
-    <p>Победи его, чтобы получить огромный куш и уважение. Ставка: 5000 💰</p>
-    <button type="button" class="danger" style="width:100%" onclick="fightBoss(event)">Сразиться</button>
-  </div>
-</div>
-
 <!-- Вкладка Казино -->
 <div id="tab-casino" class="tab-content">
   <h3>🎰 Испытай удачу</h3>
@@ -189,20 +208,6 @@
     <h4>💀 Ва-банк</h4>
     <p>Ставь ВСЁ. Шанс 10%, но выигрыш x20.</p>
     <button type="button" class="danger" style="width:100%" onclick="playCasino('allin', money, event)">Рискнуть всем</button>
-  </div>
-</div>
-
-<!-- Вкладка Питомец -->
-<div id="tab-pet" class="tab-content">
-  <div class="pet-box" id="petBox">
-    <h2 style="margin:5px;text-align:center">🐕 Собака Жуча</h2>
-    <div style="font-size:40px;margin:10px;text-align:center">🐕</div>
-    <p>Уровень: <b id="petLvl">1</b></p>
-    <p>Приносит: <b id="petIncome">0</b> монет / 10 сек</p>
-    <button type="button" onclick="upgradePet(event)" style="width:100%">Прокачать (Цена: <span id="petPrice">500</span>)</button>
-  </div>
-  <div id="petNo" style="display:none;text-align:center;padding:20px">
-    <p>У тебя нет питомца. Купи его в магазине за 1500 💰</p>
   </div>
 </div>
 
@@ -261,26 +266,28 @@ function playSound(type) {
 /* ================= АЧИВКИ ================= */
 const ACH_LIST = {
   m100:'💵 100$', m1k:'💰 1K$', m10k:'🤑 10K$', m50k:'💎 50K$', m100k:'👑 100K$', m1m:'🚀 1M$',
-  lowhp:'💔 На грани', hungry:'🍽 Голодный', tired:'😴 Без сил', sad:'😢 На дне', happy:'😊 Счастлив',
+  lowhp:'💔 На грани', hungry:'🍽 Голодный', thirsty:'💧 Обезвожен', tired:'😴 Без сил', sad:'😢 На дне', happy:'😊 Счастлив',
   d7:'📅 Неделя', d30:'📅 Месяц', d365:'📅 Год', 
   clothes:'👕 Одет', phone:'📱 На связи', tent:'⛺ Крыша', job:'💼 Работа', 
-  pet1:'🐕 Друг', pet5:'🐕‍🦺 Лучший друг',
+  pet1:'🐕 Друг', pet5:'🐕‍🦺 Лучший друг', house:'🏠 Дом', houseMax:'🏰 Пентхаус',
   reborn1:'🔄 Новая жизнь', reborn5:'🔄 5 жизней', reborn10:'🔄 10 жизней',
   trash50:'♻️ Эко-воин', sing10:'🎤 Звезда', work10:'🧹 Трудяга',
   win:'🏆 Выбрался', snow:'❄️ Видел снег', rain:'🌧 Видел дождь', 
   cas1:'🎰 Игрок', casWin:'💸 Джекпот', casLose:'💀 Всё проиграл',
   sick:'🤒 Заболел', cured:'💊 Вылечился', buyEnergy:'⚡ Энергетик',
   bank1:'🏦 Инвестор', stock1:'📈 Брокер', bossWin:'👑 Убийца босса', gangWin:'🥊 Гопник', 
-  quest1:'📋 Квестодатель', all:'👑 Легенда'
+  quest1:'📋 Квестодатель', strMax:'💪 Качок', repMax:'🔥 Авторитет', all:'👑 Легенда'
 };
 
 /* ================= СОСТОЯНИЕ ================= */
 let s = {};
-try{const raw=lsGet('bomzh_v6');if(raw){const p=JSON.parse(raw);if(p&&typeof p==='object')s=p}}catch(e){s={}}
+try{const raw=lsGet('bomzh_v8');if(raw){const p=JSON.parse(raw);if(p&&typeof p==='object')s=p}}catch(e){s={}}
 let money=clampMoney(s.money??0), food=clamp(s.food??100), energy=clamp(s.energy??100), health=clamp(s.health??100), mood=clamp(s.mood??100);
+let water=clamp(s.water??100), reputation=clamp(s.reputation??0);
 let won=s.won??false, days=Number.isFinite(s.days)?s.days:1, busy=false, tickCount=0;
 let level = Number(s.level) || 1;
 let weather = s.weather || 'clear';
+let timeOfDay = s.timeOfDay || 'day';
 let disease = Number(s.disease) || 0;
 let pet = s.pet || { owned: false, lvl: 1 };
 let inv = s.inv || { bottles: 0, scrap: 0 };
@@ -290,12 +297,15 @@ let bankBal = Number(s.bankBal) || 0;
 let stocks = Number(s.stocks) || 0;
 let stockPrice = Number(s.stockPrice) || 100;
 let quest = s.quest || { type: 'bottles', prog: 0, goal: 10, claimed: false };
+let stats = s.stats || { str: 1, luck: 1, end: 1 };
+let location = s.location || 'street';
+let houseLvl = Number(s.houseLvl) || 0; // 0 - улица, 1 - общага, 2 - квартира, 3 - пентхаус
 
 soundEnabled = s.soundEnabled !== undefined ? s.soundEnabled : true;
 document.getElementById('soundToggle').checked = soundEnabled;
 if (s.theme === 'light') { document.body.classList.add('light'); document.getElementById('themeToggle').checked = true; }
 
-function save(){lsSet('bomzh_v6',JSON.stringify({money,food,energy,health,mood,won,ach,days,level,weather,disease,pet,inv,buffs,bankBal,stocks,stockPrice,quest,theme:document.body.classList.contains('light')?'light':'dark',soundEnabled}))}
+function save(){lsSet('bomzh_v8',JSON.stringify({money,food,water,energy,health,mood,reputation,won,ach,days,level,weather,timeOfDay,disease,pet,inv,buffs,bankBal,stocks,stockPrice,quest,stats,location,houseLvl,theme:document.body.classList.contains('light')?'light':'dark',soundEnabled}))}
 
 /* ================= ЛОГ / ВИЗУАЛ ================= */
 function log(msg){
@@ -330,17 +340,20 @@ function grantAch(key) {
 function checkAch() {
   if(money>=100) grantAch('m100'); if(money>=1000) grantAch('m1k'); if(money>=10000) grantAch('m10k');
   if(money>=50000) grantAch('m50k'); if(money>=100000) grantAch('m100k'); if(money>=1000000) grantAch('m1m');
-  if(health<=20) grantAch('lowhp'); if(food<=10) grantAch('hungry'); if(energy<=10) grantAch('tired'); if(mood<=10) grantAch('sad'); if(mood>=100) grantAch('happy');
+  if(health<=20) grantAch('lowhp'); if(food<=10) grantAch('hungry'); if(water<=10) grantAch('thirsty'); if(energy<=10) grantAch('tired'); if(mood<=10) grantAch('sad'); if(mood>=100) grantAch('happy');
   if(days>=7) grantAch('d7'); if(days>=30) grantAch('d30'); if(days>=365) grantAch('d365');
   if(ach.clothes) grantAch('clothes'); if(ach.phone) grantAch('phone'); if(ach.tent) grantAch('tent'); if(ach.job) grantAch('job');
   if(pet.owned) grantAch('pet1'); if(pet.lvl>=5) grantAch('pet5');
+  if(houseLvl>=1) grantAch('house'); if(houseLvl>=3) grantAch('houseMax');
   if(level>=2) grantAch('reborn1'); if(level>=6) grantAch('reborn5'); if(level>=11) grantAch('reborn10');
   if(inv.bottles>=50) grantAch('trash50'); if(won) grantAch('win');
   if(weather==='snow') grantAch('snow'); if(weather==='rain') grantAch('rain');
   if(disease>0) grantAch('sick');
+  if(stats.str >= 10) grantAch('strMax');
+  if(reputation >= 100) grantAch('repMax');
   
   let count = Object.keys(ach).filter(k => k !== 'all').length;
-  if(count >= 59) grantAch('all');
+  if(count >= 65) grantAch('all');
 }
 
 /* ================= РЕНДЕР ================= */
@@ -350,27 +363,35 @@ function switchTab(id, btn) {
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='dungeon') renderDungeon();
+  if(id==='map') renderMap();
 }
 
 function render() {
-  food=clamp(food); energy=clamp(energy); health=clamp(health); mood=clamp(mood); money=clampMoney(money); disease=clamp(disease);
+  food=clamp(food); energy=clamp(energy); health=clamp(health); mood=clamp(mood); money=clampMoney(money); disease=clamp(disease); water=clamp(water); reputation=clamp(reputation);
   
   document.getElementById('money').textContent = money;
   document.getElementById('foodTxt').textContent = Math.floor(food);
+  document.getElementById('waterTxt').textContent = Math.floor(water);
   document.getElementById('energyTxt').textContent = Math.floor(energy);
   document.getElementById('healthTxt').textContent = Math.floor(health);
   document.getElementById('moodTxt').textContent = Math.floor(mood);
+  document.getElementById('repTxt').textContent = Math.floor(reputation);
   document.getElementById('dayTxt').textContent = '📅 День '+days;
   document.getElementById('lvlBadge').textContent = 'Ур. '+level;
   
   let wTxt = weather==='snow'?'❄️ Снег': weather==='rain'?'🌧 Дождь': weather==='heat'?'🔥 Жара':'☀️ Ясно';
   document.getElementById('weatherTxt').textContent = wTxt;
+  document.getElementById('timeTxt').textContent = timeOfDay==='day'?'☀️ День':'🌙 Ночь';
+  
+  let locNames = {street: 'Улица', station: 'Вокзал', center: 'Центр', industrial: 'Промзона', forest: 'Лес'};
+  document.getElementById('locTxt').textContent = '📍 ' + locNames[location];
   
   document.getElementById('foodBar').style.width=food+'%';
+  document.getElementById('waterBar').style.width=water+'%';
   document.getElementById('energyBar').style.width=energy+'%';
   document.getElementById('healthBar').style.width=health+'%';
   document.getElementById('moodBar').style.width=mood+'%';
+  document.getElementById('repBar').style.width=reputation+'%';
   
   if(disease > 0) {
     document.getElementById('diseaseStat').style.display = 'block';
@@ -384,16 +405,12 @@ function render() {
   if(buffs.energyDrink > 0) bText.push(`⚡ Энергетик: x2 доход`);
   document.getElementById('buffsBox').textContent = bText.length ? bText.join(' | ') : 'Нет эффектов';
   
-  if(pet.owned) {
-    document.getElementById('petBox').classList.add('active');
-    document.getElementById('petNo').style.display = 'none';
-    document.getElementById('petLvl').textContent = pet.lvl;
-    document.getElementById('petIncome').textContent = pet.lvl * 3;
-    document.getElementById('petPrice').textContent = pet.lvl * 500;
-  } else {
-    document.getElementById('petBox').classList.remove('active');
-    document.getElementById('petNo').style.display = 'block';
-  }
+  document.getElementById('strLvl').textContent = stats.str;
+  document.getElementById('luckLvl').textContent = stats.luck;
+  document.getElementById('endLvl').textContent = stats.end;
+  document.getElementById('strCost').textContent = stats.str * 500;
+  document.getElementById('luckCost').textContent = stats.luck * 500;
+  document.getElementById('endCost').textContent = stats.end * 500;
   
   document.getElementById('bankBalTxt').textContent = bankBal;
   document.getElementById('stockPrice').textContent = stockPrice;
@@ -409,8 +426,43 @@ function render() {
     document.getElementById('questBtn').disabled = quest.prog < quest.goal;
   }
   
+  renderMap();
   checkAch();
   save();
+}
+
+/* ================= КАРТА ================= */
+function changeLoc(newLoc, ev) {
+  if(location === newLoc) return;
+  location = newLoc;
+  playSound('click');
+  log('📍 Ты перешел на локацию: ' + newLoc);
+  render();
+}
+
+function renderMap() {
+  document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
+  let el = document.getElementById('loc-'+location);
+  if(el) el.classList.add('active');
+  
+  let houses = ['Улица', 'Общежитие', 'Квартира', 'Пентхаус'];
+  let costs = [1000, 5000, 20000, 100000];
+  document.getElementById('houseName').textContent = houses[houseLvl];
+  document.getElementById('houseCost').textContent = houseLvl < 3 ? costs[houseLvl] : 'Максимум';
+}
+
+function buyHouse(ev) {
+  if(houseLvl >= 3) { toast('У тебя уже лучший дом!'); return; }
+  let costs = [1000, 5000, 20000, 100000];
+  let cost = costs[houseLvl];
+  if(money < cost) { toast('Мало денег!'); return; }
+  
+  money -= cost;
+  houseLvl++;
+  playSound('upgrade');
+  toast('Жилье улучшено!');
+  log('🏠 Ты купил новое жилье!');
+  render();
 }
 
 /* ================= МАГАЗИН ================= */
@@ -420,8 +472,9 @@ function renderShop() {
   const cBox = document.getElementById('shop-craft'); cBox.innerHTML='';
   
   const foods = [
-    {id:'food',label:'🍞 Еда',p:20}, {id:'soup',label:'🍲 Суп',p:30}, {id:'energy',label:'☕ Кофе',p:15},
-    {id:'energy2',label:'🍫 Шоколад',p:25}, {id:'health',label:'💊 Аптечка',p:40}, {id:'energyDrink',label:'🥤 Энергетик',p:150}
+    {id:'food',label:'🍞 Еда',p:20}, {id:'soup',label:'🍲 Суп',p:30}, {id:'water',label:'💧 Вода',p:10},
+    {id:'energy',label:'☕ Кофе',p:15}, {id:'energy2',label:'🍫 Шоколад',p:25}, {id:'health',label:'💊 Аптечка',p:40}, 
+    {id:'energyDrink',label:'🥤 Энергетик',p:150}
   ];
   foods.forEach(it=>{
     const b=document.createElement('button'); b.innerHTML=it.label+'<br><span style="font-size:11px">'+it.p+' 💰</span>';
@@ -457,29 +510,68 @@ function guard(fn,ev){if(busy)return;busy=true;const b=ev&&ev.currentTarget;if(b
 function getMultiplier() {
   let m = 1 + ((level-1) * 0.10);
   if(buffs.energyDrink > 0) m *= 2;
+  m += (stats.luck - 1) * 0.05;
+  
+  // Бонус от локации
+  if(location==='center') m *= 1.5;
+  if(location==='station') m *= 1.2;
+  
   return m;
+}
+function getEnergyCost(base) {
+  let cost = base - ((stats.end - 1) * 0.5);
+  return Math.max(1, Math.floor(cost));
 }
 
 function beg(ev){guard(()=>{
-  if(energy<5){log('Нет сил.');return}
+  let cost = getEnergyCost(5);
+  if(energy<cost){log('Нет сил.');return}
+  
+  if(location==='center' && Math.random()<0.3) {
+    log('👮 Полиция оштрафовала за попрошайничество!');
+    money = clampMoney(money - 50);
+    reputation = clamp(reputation - 5);
+    energy = clamp(energy - cost);
+    render(); return;
+  }
+  
   let got=rand(1,20); got=Math.floor(got*getMultiplier()*(ach.clothes?1.5:1));
-  money=clampMoney(money+got); energy=clamp(energy-5);
+  money=clampMoney(money+got); energy=clamp(energy-cost); reputation=clamp(reputation+1);
   playSound('money'); floatText('+'+got,'#ffd700',ev); log('Подали '+got);
   randomEvent(); renderShop(); render();
 },ev)}
 
 function work(ev){guard(()=>{
-  if(energy<20){log('Устал.');return}
+  let cost = getEnergyCost(20);
+  if(energy<cost){log('Устал.');return}
   let pay=rand(20,60); pay=Math.floor(pay*getMultiplier());
-  money=clampMoney(money+pay); energy=clamp(energy-20); mood=clamp(mood-5);
+  money=clampMoney(money+pay); energy=clamp(energy-cost); mood=clamp(mood-5); reputation=clamp(reputation+2);
   playSound('money'); floatText('+'+pay,'#ffd700',ev); log('Заработал '+pay);
   randomEvent(); renderShop(); render();
 },ev)}
 
+function sleepStreet(ev){guard(()=>{
+  if(energy>=100){log('Ты и так бодр.');return}
+  
+  let bonus = 0;
+  if(houseLvl===1) bonus = 10;
+  if(houseLvl===2) bonus = 25;
+  if(houseLvl===3) bonus = 50;
+  
+  if(timeOfDay === 'night') bonus += 10;
+  
+  energy=clamp(energy+40+bonus); 
+  if(houseLvl === 0) { health=clamp(health-5); mood=clamp(mood-5); log('Поспал на улице. Энергия +'+(40+bonus)+', здоровье -5.'); }
+  else { health=clamp(health+5); mood=clamp(mood+5); log('Поспал дома. Энергия +'+(40+bonus)+', здоровье +5.'); }
+  
+  playSound('click'); render();
+},ev)}
+
 function dumpster(ev){guard(()=>{
-  if(energy<10){log('Нет сил.');return}
-  energy=clamp(energy-10); const r=Math.random();
-  if(r<0.3){food=clamp(food+25);log('Нашёл еду.')}
+  let cost = getEnergyCost(10);
+  if(energy<cost){log('Нет сил.');return}
+  energy=clamp(energy-cost); const r=Math.random();
+  if(r<0.3){food=clamp(food+20); log('Нашёл еду.')}
   else if(r<0.5){let m=Math.floor(rand(10,30)*getMultiplier());money=clampMoney(money+m);playSound('money');log('Нашёл '+m);}
   else if(r<0.7){health=clamp(health-5);playSound('bad');log('Поранился.')}
   else{inv.scrap++; log('Нашёл металл.')}
@@ -487,38 +579,28 @@ function dumpster(ev){guard(()=>{
 },ev)}
 
 function scavenge(ev){guard(()=>{
-  if(energy<15){log('Нет сил.');return}
-  energy=clamp(energy-15); 
-  let found = rand(1,3);
+  let cost = getEnergyCost(15);
+  if(energy<cost){log('Нет сил.');return}
+  energy=clamp(energy-cost); 
+  
+  let mult = location==='industrial' ? 3 : (location==='forest' ? 0 : 1);
+  let found = rand(1,3) * mult;
+  if(found === 0) { log('Здесь нет бутылок.'); return; }
+  
   inv.bottles += found;
   if(quest.type==='bottles' && !quest.claimed) quest.prog += found;
-  if(Math.random()<0.3) inv.scrap++;
+  if(Math.random()<0.3*mult) inv.scrap++;
   log('Собрал '+found+' бутылок.');
   renderShop(); render();
 },ev)}
 
 function sing(ev){guard(()=>{
-  if(energy<10){log('Нет сил петь.');return}
-  energy=clamp(energy-10); let earned=Math.floor(rand(5,30)*getMultiplier());
-  money=clampMoney(money+earned); mood=clamp(mood+10);
+  let cost = getEnergyCost(10);
+  if(energy<cost){log('Нет сил петь.');return}
+  energy=clamp(energy-cost); let earned=Math.floor(rand(5,30)*getMultiplier());
+  money=clampMoney(money+earned); mood=clamp(mood+10); reputation=clamp(reputation+1);
   playSound('money'); floatText('+'+earned,'#ffd700',ev); log('Спел на '+earned);
   renderShop(); render();
-},ev)}
-
-function gangFight(ev){guard(()=>{
-  if(energy<25){log('Нет сил драться.');return}
-  energy=clamp(energy-25);
-  if(health < 30) { log('Слишком слаб для драки.'); health=clamp(health-5); return; }
-  
-  if(Math.random() < 0.5) {
-    let win = Math.floor(rand(50, 150) * getMultiplier());
-    money=clampMoney(money+win); health=clamp(health-15);
-    playSound('win'); floatText('+'+win,'#ffd700',ev); log('🥊 Ты отбил деньги: +'+win); grantAch('gangWin');
-  } else {
-    health=clamp(health-25); money=clampMoney(money-rand(10,50));
-    playSound('bad'); log('🥊 Тебя побили и обобрали.');
-  }
-  render();
 },ev)}
 
 function claimQuest(ev) {
@@ -528,6 +610,17 @@ function claimQuest(ev) {
   grantAch('quest1');
   playSound('win'); toast('Квест выполнен! +500');
   render();
+}
+
+/* ================= ПРОКАЧКА СТАТОВ ================= */
+function upgradeStat(type, ev) {
+  let cost = stats[type] * 500;
+  if(money < cost) { toast('Мало денег'); return; }
+  money -= cost;
+  stats[type]++;
+  playSound('upgrade');
+  toast('Улучшено!');
+  renderShop(); render();
 }
 
 /* ================= СИСТЕМЫ ================= */
@@ -563,18 +656,19 @@ function playCasino(game, bet, ev) {
   
   money -= bet;
   let win = false, mult = 0;
+  let luckBonus = (stats.luck - 1) * 0.02;
   
   if(game==='slot') {
     let r = Math.random();
-    if(r<0.05) { win=true; mult=10; log('🎰 ДЖЕКПОТ! x10'); }
-    else if(r<0.3) { win=true; mult=2; log('🎰 Выигрыш x2'); }
+    if(r < 0.05 + luckBonus) { win=true; mult=10; log('🎰 ДЖЕКПОТ! x10'); }
+    else if(r < 0.3 + luckBonus) { win=true; mult=2; log('🎰 Выигрыш x2'); }
     else log('🎰 Проигрыш');
   } else if(game==='dice') {
     let my = rand(1,6), his = rand(1,6);
     if(my > his) { win=true; mult=2; log(`🎲 Ты: ${my}, Казино: ${his} — Победа!`); }
     else log(`🎲 Ты: ${my}, Казино: ${his} — Проигрыш`);
   } else if(game==='allin') {
-    if(Math.random()<0.1) { win=true; mult=20; log('💀 ВА-БАНК УДАЛСЯ! x20'); }
+    if(Math.random() < 0.1 + luckBonus) { win=true; mult=20; log('💀 ВА-БАНК УДАЛСЯ! x20'); }
     else { log('💀 Всё проиграно.'); money=0; }
   }
   
@@ -589,62 +683,6 @@ function playCasino(game, bet, ev) {
     if (money <= 0) { grantAch('casLose'); }
   }
   
-  renderShop(); render();
-}
-
-function renderDungeon() {
-  const box = document.getElementById('dungeonList'); box.innerHTML = '';
-  const enemies = [
-    {name:'Местный алкаш', hp:50, reward:100, color:'#f1c40f'},
-    {name:'Уличный гопник', hp:150, reward:300, color:'#e67e22'},
-    {name:'Скинхед', hp:400, reward:800, color:'#e74c3c'},
-    {name:'Наркобарон', hp:1000, reward:2500, color:'#9b59b6'}
-  ];
-  enemies.forEach((enemy, i) => {
-    const card = document.createElement('div'); card.className = 'item-card'; card.style.borderColor = enemy.color;
-    card.innerHTML = `<h4>${enemy.name}</h4><p>Здоровье: ${enemy.hp} | Награда: ${enemy.reward} 💰</p>`;
-    const btn = document.createElement('button'); btn.className = 'danger'; btn.style.width = '100%'; btn.style.marginTop = '10px';
-    btn.textContent = 'Атаковать';
-    btn.onclick = (e) => fightEnemy(enemy, e);
-    card.appendChild(btn); box.appendChild(card);
-  });
-}
-
-function fightEnemy(enemy, ev) {
-  if(energy < 20) { toast('Нет энергии'); return; }
-  energy -= 20;
-  let win = Math.random() > 0.4;
-  if(health >= enemy.hp) win = true;
-  
-  if(win) {
-    health = clamp(health - Math.floor(enemy.hp * 0.2));
-    let reward = Math.floor(enemy.reward * getMultiplier());
-    money = clampMoney(money + reward);
-    playSound('win'); floatText('+'+reward,'#ffd700',ev); log('⚔️ Победа над ' + enemy.name + '! +' + reward);
-  } else {
-    health = clamp(health - enemy.hp);
-    playSound('bad'); log('💀 Ты проиграл ' + enemy.name);
-  }
-  render();
-}
-
-function fightBoss(ev) {
-  if(money < 5000) { toast('Нужно 5000 денег для ставки'); return; }
-  if(energy < 50) { toast('Мало энергии'); return; }
-  energy -= 50;
-  if(Math.random() > 0.7) {
-    money += 20000; grantAch('bossWin'); playSound('win'); log('👑 Ты победил Смотрящего! +20000');
-  } else {
-    money = 0; health = clamp(health - 50); playSound('bad'); log('👑 Смотрящий размазал тебя. Ты потерял всё.');
-  }
-  render();
-}
-
-function upgradePet(ev) {
-  let cost = pet.lvl * 500;
-  if(money < cost) { toast('Мало монет'); return; }
-  money -= cost; pet.lvl++;
-  playSound('upgrade'); toast('Жуча прокачана до ур.'+pet.lvl);
   renderShop(); render();
 }
 
@@ -668,6 +706,7 @@ function buy(type, price, ev) {
     money -= price;
     
     if(type==='food') food=clamp(food+30);
+    else if(type==='water') water=clamp(water+40);
     else if(type==='soup') { food=clamp(food+45); health=clamp(health+10); }
     else if(type==='energy') energy=clamp(energy+40);
     else if(type==='energy2') { food=clamp(food+10); energy=clamp(energy+25); }
@@ -683,6 +722,7 @@ function buy(type, price, ev) {
   }, ev);
 }
 
+/* ================= НАСТРОЙКИ ================= */
 function openSettings() { playSound('click'); renderAchList(); document.getElementById('settingsModal').classList.add('show'); }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('show'); }
 function toggleTheme() { document.body.classList.toggle('light'); save(); }
@@ -701,7 +741,7 @@ function renderAchList() {
   document.getElementById('achCount').textContent = c;
 }
 function resetGame(ev){
-  try{lsDel('bomzh_v6')}catch(e){} location.reload();
+  try{lsDel('bomzh_v8')}catch(e){} location.reload();
 }
 
 function openRebirth() {
@@ -710,25 +750,26 @@ function openRebirth() {
 }
 function doRebirth() {
   level++;
-  money=0; food=100; energy=100; health=100; mood=100; disease=0; days=1; won=false; inv={bottles:0,scrap:0}; bankBal=0; stocks=0;
+  money=0; food=100; water=100; energy=100; health=100; mood=100; reputation=0; disease=0; days=1; won=false; inv={bottles:0,scrap:0}; bankBal=0; stocks=0; stats={str:1,luck:1,end:1}; houseLvl=0;
   document.getElementById('rebirthModal').classList.remove('show');
   log('🔄 Новая жизнь! Уровень: '+level); playSound('upgrade');
   renderShop(); render();
 }
 
 setInterval(()=>{
-  food=clamp(food-1); energy=clamp(energy-0.5); mood=clamp(mood-0.3);
+  food=clamp(food-1); water=clamp(water-1.5); energy=clamp(energy-0.5); mood=clamp(mood-0.3);
   if(buffs.energyDrink > 0) buffs.energyDrink--;
   
   if(weather==='snow') { energy=clamp(energy-0.5); }
-  if(weather==='heat') { food=clamp(food-0.5); }
+  if(weather==='heat') { water=clamp(water-1); }
   if(weather==='rain') { mood=clamp(mood-0.2); }
   
   if(food<=0) health=clamp(health-2);
+  if(water<=0) health=clamp(health-3);
   if(disease>0) health=clamp(health-1);
   
   if(health<=0) {
-    money=Math.floor(money*0.5); food=100; health=100; disease=0;
+    money=Math.floor(money*0.5); food=100; water=100; health=100; disease=0;
     playSound('bad'); log('💀 Обморок. Потерял половину денег.'); toast('💀 Обморок!');
   }
   
@@ -750,6 +791,12 @@ setInterval(()=>{
   tickCount++;
   if(tickCount%12===0) { days++; log('📅 День '+days); }
   
+  // Смена дня и ночи (каждые 60 секунд)
+  if(tickCount%6===0) {
+    timeOfDay = timeOfDay==='day' ? 'night' : 'day';
+    log(timeOfDay==='day'?'☀️ Наступил день.':'🌙 Наступила ночь.');
+  }
+  
   if(tickCount%20===0) {
     let r = Math.random();
     if(r<0.4) weather='clear'; else if(r<0.6) weather='rain'; else if(r<0.8) weather='snow'; else weather='heat';
@@ -758,7 +805,7 @@ setInterval(()=>{
   render();
 }, 10000);
 
-renderShop(); render(); renderAchList(); renderDungeon(); log('Игра готова к установке! v6.1');
+renderShop(); render(); renderAchList(); log('v8.0 CITY LIFE: Карта, Репутация, Жажда и Жилье добавлены!');
 </script>
 </body>
-  </html>
+    </html>
