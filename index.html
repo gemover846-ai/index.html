@@ -3,383 +3,573 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Симулятор бомжа — финал</title>
+<title>Симулятор Бомжа — v4.1 Ultimate</title>
 <style>
-  :root{--bg:#16161c;--panel:#23232c;--text:#eaeaf0;--muted:#9a9aa8;
-  --gold:#ffd700;--food:#e67e22;--energy:#3498db;--health:#e74c3c;--mood:#9b59b6;}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:radial-gradient(circle at 50% -10%,#2c2c3a,var(--bg) 60%);
-  color:var(--text);margin:0;padding:12px 12px 50px;text-align:center;min-height:100vh;overflow-x:hidden}
-  h1{font-size:20px;margin:4px 0 2px;letter-spacing:.4px}
-  .sub{font-size:12px;color:var(--muted);margin-bottom:8px}
-  .money{font-size:28px;color:var(--gold);font-weight:800;margin:6px 0;
-  text-shadow:0 0 14px rgba(255,215,0,.4);transition:transform .15s}
-  .money.bump{transform:scale(1.14)}
-  .topline{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:2px 4px 8px}
-  .stat{margin:3px 0}
-  .stat-label{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;padding:0 3px}
-  .bar{background:#353540;border-radius:10px;height:15px;margin:2px 0 7px;overflow:hidden;position:relative}
-  .bar div{height:100%;transition:width .35s ease;border-radius:10px}
-  .bar.food div{background:linear-gradient(90deg,#e67e22,#f39c12)}
-  .bar.energy div{background:linear-gradient(90deg,#2980b9,#3498db)}
-  .bar.health div{background:linear-gradient(90deg,#c0392b,#e74c3c)}
-  .bar.mood div{background:linear-gradient(90deg,#8e44ad,#9b59b6)}
-  .bar.low div{animation:pulse 1s infinite}
-  .bar .glow{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
-  animation:shine 2.5s infinite;pointer-events:none}
-  button{background:linear-gradient(180deg,#45454f,#343440);color:var(--text);border:none;border-radius:12px;
-  padding:11px 12px;margin:4px 3px;font-size:14px;font-weight:600;cursor:pointer;
-  box-shadow:0 2px 0 #0d0d12,0 5px 14px rgba(0,0,0,.35);
-  transition:transform .08s,box-shadow .08s,background .2s;width:calc(50% - 8px);max-width:230px;
-  position:relative;overflow:hidden}
-  button:active{transform:translateY(2px);box-shadow:0 0 0 #0d0d12;background:#555}
-  button:disabled{opacity:.4}
-  button .rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);
-  transform:scale(0);animation:rip .5s ease-out;pointer-events:none}
-  .shop button{background:linear-gradient(180deg,#2d6a4f,#1c4a35)}
-  .shop button:active{background:#2d6a4f}
-  .shop button.owned{background:linear-gradient(180deg,#3a3a48,#2a2a35);opacity:.7}
-  .danger{background:linear-gradient(180deg,#7a2e2e,#541b1b)!important}
-  h3{font-size:13px;margin:14px 0 4px;color:var(--muted);font-weight:600;letter-spacing:.5px}
-  .log{font-size:12px;color:var(--muted);height:120px;overflow-y:auto;margin-top:10px;text-align:left;
-  background:var(--panel);border-radius:12px;padding:9px;border:1px solid #333}
-  .log div{animation:slideIn .25s ease;padding:2px 0;border-bottom:1px solid #2a2a34;word-break:break-word}
-  .log div:last-child{border-bottom:none}
-  .ach{font-size:12px;color:var(--gold);margin-top:8px;font-weight:600}
-  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(120px);
-  background:#2f2f3a;color:#fff;padding:9px 15px;border-radius:20px;font-size:13px;opacity:0;
-  transition:all .3s ease;z-index:120;pointer-events:none;max-width:92%;box-shadow:0 6px 24px rgba(0,0,0,.6)}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .float{position:fixed;font-weight:800;font-size:17px;pointer-events:none;
-  animation:floatUp .95s ease forwards;z-index:110;text-shadow:0 2px 6px rgba(0,0,0,.7)}
-  @keyframes floatUp{to{transform:translateY(-70px);opacity:0}}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
-  @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
-  @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-  @keyframes rip{to{transform:scale(3);opacity:0}}
-  @media(min-width:620px){button{width:auto}}
+  :root {
+    --bg: #0f0f13; --panel: #1a1a22; --text: #f0f0f5; --muted: #8b8b9a;
+    --gold: #ffd700; --food: #e67e22; --energy: #3498db; --health: #e74c3c;
+    --mood: #9b59b6; --accent: #00d2ff; --disease: #2ecc71;
+  }
+  body.light { --bg: #f4f4f9; --panel: #ffffff; --text: #111; --muted: #666; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: radial-gradient(circle at 50% -10%, var(--panel), var(--bg) 70%); color: var(--text); margin: 0; padding: 10px 10px 80px; text-align: center; min-height: 100vh; transition: background .3s; }
+  h1 { font-size: 20px; margin: 4px 0; text-shadow: 0 2px 4px rgba(0,0,0,.5); display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+  .tab-bar { display: flex; justify-content: center; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
+  .tab-btn { background: var(--panel); color: var(--muted); border: 1px solid #333; border-radius: 20px; padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer; transition: .2s; }
+  .tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  .tab-content { display: none; animation: fadeIn .3s; }
+  .tab-content.active { display: block; }
+  .money { font-size: 32px; color: var(--gold); font-weight: 900; margin: 5px 0; text-shadow: 0 0 15px rgba(255,215,0,.4); transition: transform .15s; }
+  .money.bump { transform: scale(1.1); }
+  .topline { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin: 0 5px 10px; font-weight: bold; }
+  .stat { margin: 4px 0; }
+  .stat-label { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; padding: 0 4px; font-weight: bold; }
+  .bar { background: #222; border-radius: 8px; height: 14px; margin: 2px 0 8px; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,.6); }
+  .bar div { height: 100%; transition: width .3s ease; border-radius: 8px; }
+  .bar.food div { background: linear-gradient(90deg, #d35400, #e67e22); }
+  .bar.energy div { background: linear-gradient(90deg, #2980b9, #3498db); }
+  .bar.health div { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+  .bar.mood div { background: linear-gradient(90deg, #8e44ad, #9b59b6); }
+  .bar.disease div { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+  .bar.low div { animation: pulse 1s infinite; }
+  button { background: linear-gradient(180deg, #2e2e38, #22222a); color: var(--text); border: 1px solid #444; border-radius: 10px; padding: 12px; margin: 4px 2px; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #000; transition: transform .08s; width: calc(50% - 6px); position: relative; overflow: hidden; }
+  body.light button { background: #ddd; color: #000; border-color: #ccc; box-shadow: 0 3px 0 #bbb; }
+  button:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
+  button:disabled { opacity: .5; box-shadow: none; transform: none; cursor: not-allowed; }
+  .shop button { background: linear-gradient(180deg, #1e8449, #145a32); border-color: #2ecc71; color: #fff; }
+  .casino button { background: linear-gradient(180deg, #8e44ad, #5b2c6f); border-color: #9b59b6; color: #fff; }
+  .danger { background: linear-gradient(180deg, #922b21, #641e16) !important; color: #fff !important; border-color: #e74c3c !important; }
+  h3 { font-size: 12px; margin: 16px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .log { font-size: 12px; color: var(--muted); height: 100px; overflow-y: auto; margin-top: 10px; text-align: left; background: var(--panel); border-radius: 10px; padding: 8px; border: 1px solid #333; }
+  .log div { animation: slideIn .2s ease; padding: 3px 0; border-bottom: 1px solid #2a2a34; }
+  body.light .log div { border-bottom: 1px solid #eee; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120px); background: #111; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 14px; font-weight: bold; opacity: 0; transition: all .3s cubic-bezier(0.175,0.885,0.32,1.275); z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,.6); border: 1px solid #333; max-width: 90%; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .float { position: fixed; font-weight: 900; font-size: 18px; pointer-events: none; animation: floatUp .9s ease-out forwards; z-index: 1000; text-shadow: 0 2px 5px rgba(0,0,0,.8); }
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 10000; align-items: center; justify-content: center; padding: 15px; }
+  .modal.show { display: flex; }
+  .modal-content { background: var(--panel); padding: 20px; border-radius: 16px; width: 100%; max-width: 400px; text-align: left; max-height: 85vh; overflow-y: auto; border: 1px solid #444; }
+  .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; inset: 0; background-color: #555; transition: .3s; border-radius: 24px; }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; }
+  input:checked + .slider { background-color: #2ecc71; }
+  input:checked + .slider:before { transform: translateX(20px); }
+  .setting-row { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+  .close-btn { width: 100%; margin-top: 15px; background: #444; color: #fff; padding: 12px; border-radius: 10px; font-size: 15px; border: none; font-weight: bold; }
+  .pet-box { background: #2c3e50; padding: 10px; border-radius: 10px; margin: 10px 0; border: 1px solid #34495e; display: none; text-align: left; font-size: 13px; }
+  .pet-box.active { display: block; }
+  .ach-item { display: inline-block; background: #222; border: 1px solid #333; padding: 4px 8px; border-radius: 8px; font-size: 11px; margin: 2px; color: #555; transition: .3s; }
+  .ach-item.unlocked { color: #ffd700; border-color: #ffd700; box-shadow: 0 0 5px rgba(255,215,0,.3); }
+  @keyframes floatUp { to { transform: translateY(-60px); opacity: 0; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head>
 <body>
-<h1>🚬 Симулятор бомжа</h1>
-<div class="sub">финальная версия</div>
-<div class="money" id="moneyEl">💰 <span id="money">0</span></div>
-<div class="topline"><span id="dayTxt">📅 День 1</span><span id="wonTxt"></span></div>
+<h1>🚬 Бомж v4.1 <span id="lvlBadge" style="font-size:12px;color:var(--accent)">Ур. 1</span></h1>
 
-<div class="stat"><div class="stat-label"><span>🍞 Голод</span><span id="foodTxt">100</span></div>
-<div class="bar food" id="foodBarWrap"><div id="foodBar" style="width:100%"></div><div class="glow"></div></div></div>
-<div class="stat"><div class="stat-label"><span>⚡ Энергия</span><span id="energyTxt">100</span></div>
-<div class="bar energy" id="energyBarWrap"><div id="energyBar" style="width:100%"></div><div class="glow"></div></div></div>
-<div class="stat"><div class="stat-label"><span>❤️ Здоровье</span><span id="healthTxt">100</span></div>
-<div class="bar health" id="healthBarWrap"><div id="healthBar" style="width:100%"></div><div class="glow"></div></div></div>
-<div class="stat"><div class="stat-label"><span>😊 Настроение</span><span id="moodTxt">100</span></div>
-<div class="bar mood" id="moodBarWrap"><div id="moodBar" style="width:100%"></div><div class="glow"></div></div></div>
+<div class="tab-bar">
+  <div class="tab-btn active" onclick="switchTab('main', this)">🏠 Город</div>
+  <div class="tab-btn" onclick="switchTab('shop', this)">🛒 Магазин</div>
+  <div class="tab-btn" onclick="switchTab('casino', this)">🎰 Казино</div>
+  <div class="tab-btn" onclick="switchTab('pet', this)">🐕 Питомец</div>
+</div>
 
-<button type="button" onclick="beg(event)">🙏 Милостыня</button>
-<button type="button" onclick="work(event)">🧹 Помыть машину (-20⚡)</button>
-<button type="button" onclick="dumpster(event)">🗑 Мусорка (-10⚡)</button>
-<button type="button" onclick="sleepStreet(event)">🌙 Поспать на улице</button>
-<button type="button" onclick="pray(event)">🙏 Помолиться</button>
-<button type="button" onclick="sing(event)">🎤 Споеть песню</button>
-<button type="button" class="danger" onclick="resetGame(event)">🔄 Сброс</button>
+<div id="tab-main" class="tab-content active">
+  <div class="money" id="moneyEl">💰 <span id="money">0</span></div>
+  <div class="topline"><span id="dayTxt">📅 День 1</span><span id="weatherTxt">☀️ Ясно</span></div>
+  
+  <div class="stat"><div class="stat-label"><span>🍞 Голод</span><span id="foodTxt">100</span></div><div class="bar food"><div id="foodBar" style="width:100%"></div></div></div>
+  <div class="stat"><div class="stat-label"><span>⚡ Энергия</span><span id="energyTxt">100</span></div><div class="bar energy"><div id="energyBar" style="width:100%"></div></div></div>
+  <div class="stat"><div class="stat-label"><span>❤️ Здоровье</span><span id="healthTxt">100</span></div><div class="bar health"><div id="healthBar" style="width:100%"></div></div></div>
+  <div class="stat"><div class="stat-label"><span>😊 Настроение</span><span id="moodTxt">100</span></div><div class="bar mood"><div id="moodBar" style="width:100%"></div></div></div>
+  <div class="stat" id="diseaseStat" style="display:none"><div class="stat-label"><span>🤒 Болезнь</span><span id="diseaseTxt">0</span></div><div class="bar disease"><div id="diseaseBar" style="width:0%"></div></div></div>
 
-<h3>🛒 Магазин</h3>
-<div class="shop" id="shop"></div>
+  <button type="button" onclick="beg(event)">🙏 Милостыня</button>
+  <button type="button" onclick="work(event)">🧹 Помыть машину</button>
+  <button type="button" onclick="dumpster(event)">🗑 Мусорка</button>
+  <button type="button" onclick="scavenge(event)">♻️ Собрать бутылки</button>
+  <button type="button" onclick="sleepStreet(event)">🌙 Поспать</button>
+  <button type="button" onclick="sing(event)">🎤 Споеть</button>
+  
+  <h3>Активные эффекты</h3>
+  <div id="buffsBox" style="font-size:12px;color:var(--accent)">Нет эффектов</div>
+  
+  <div class="log" id="log"></div>
+</div>
 
-<div class="log" id="log"></div>
-<div class="ach" id="achList"></div>
+<div id="tab-shop" class="tab-content">
+  <h3>Еда и Здоровье</h3>
+  <div class="shop" id="shop-food"></div>
+  <h3>Улучшения</h3>
+  <div class="shop" id="shop-upgrades"></div>
+  <h3>Крафт (Сдача ресурсов)</h3>
+  <div class="shop" id="shop-craft"></div>
+</div>
+
+<div id="tab-casino" class="tab-content">
+  <h3>🎰 Испытай удачу</h3>
+  <p style="font-size:12px;color:var(--muted)">Ставки высоки. Можно выиграть всё, а можно потерять последнее.</p>
+  <div class="casino">
+    <button type="button" onclick="playCasino('slot', 50, event)">🎰 Слоты (50)</button>
+    <button type="button" onclick="playCasino('dice', 100, event)">🎲 Кости (100)</button>
+    <button type="button" onclick="playCasino('shells', 200, event)">🥥 Наперстки (200)</button>
+    <button type="button" onclick="playCasino('allin', money, event)" class="danger">💀 Ва-банк (Все)</button>
+  </div>
+</div>
+
+<div id="tab-pet" class="tab-content">
+  <div class="pet-box" id="petBox">
+    <h2 style="margin:5px;text-align:center">🐕 Собака Жуча</h2>
+    <div style="font-size:40px;margin:10px;text-align:center">🐕</div>
+    <p>Уровень: <b id="petLvl">1</b></p>
+    <p>Приносит: <b id="petIncome">0</b> монет / 10 сек</p>
+    <p style="font-size:12px;color:#aaa">Жуча защищает тебя от 50% плохих событий и приносит пассивный доход.</p>
+    <button type="button" onclick="upgradePet(event)" style="width:100%">Прокачать (Цена: <span id="petPrice">500</span>)</button>
+  </div>
+  <div id="petNo" style="display:none;text-align:center;padding:20px">
+    <p>У тебя нет питомца. Купи его в магазине за 1500 💰</p>
+  </div>
+</div>
+
+<div class="modal" id="settingsModal">
+  <div class="modal-content">
+    <h2 style="text-align:center;margin-top:0">⚙️ Настройки</h2>
+    <div class="setting-row"><span>Светлая тема</span><label class="switch"><input type="checkbox" id="themeToggle" onchange="toggleTheme()"><span class="slider"></span></label></div>
+    <div class="setting-row"><span>Звуки</span><label class="switch"><input type="checkbox" id="soundToggle" checked onchange="toggleSound()"><span class="slider"></span></label></div>
+    <div class="setting-row" style="border:none"><span>Реинкарнация</span><button style="width:auto;margin:0;padding:8px;background:#2980b9" onclick="openRebirth()">Начать заново</button></div>
+    <div class="setting-row" style="border:none"><span>Полный сброс</span><button class="danger" style="width:auto;margin:0;padding:8px" onclick="resetGame(event)">Удалить</button></div>
+    <h3>🏆 Ачивки (<span id="achCount">0</span>/40)</h3>
+    <div id="achListBox" style="max-height:150px;overflow-y:auto;margin-bottom:15px;text-align:center"></div>
+    <button class="close-btn" onclick="closeSettings()">Закрыть</button>
+  </div>
+</div>
+
+<div class="modal" id="rebirthModal">
+  <div class="modal-content" style="text-align:center">
+    <h2 style="color:#00d2ff">🔄 Реинкарнация</h2>
+    <p>Начать жизнь с нуля, но получить <b>Уровень</b>. Каждый уровень даёт <b>+10%</b> к деньгам.</p>
+    <p>Текущий уровень: <b id="xpModalTxt">1</b></p>
+    <button class="danger" style="width:100%" onclick="doRebirth()">Начать заново</button>
+    <button class="close-btn" onclick="document.getElementById('rebirthModal').classList.remove('show')">Отмена</button>
+  </div>
+</div>
+
+<button type="button" class="danger" style="position:fixed;bottom:15px;right:15px;width:50px;height:50px;border-radius:50%;font-size:20px;z-index:100;box-shadow:0 4px 10px rgba(0,0,0,0.5);border:none" onclick="openSettings()">⚙️</button>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ---------- утилиты ---------- */
+/* ================= УТИЛИТЫ ================= */
 function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
 function clamp(v){v=Number(v);if(!Number.isFinite(v))return 0;return Math.max(0,Math.min(100,v))}
 function clampMoney(v){v=Number(v);if(!Number.isFinite(v))return 0;return Math.max(0,Math.floor(v))}
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
 
-/* ---------- состояние ---------- */
-let s={};
-try{const raw=lsGet('bomzh');if(raw){const p=JSON.parse(raw);if(p&&typeof p==='object')s=p}}catch(e){s={}}
-let money=clampMoney(s.money??0);
-let food=clamp(s.food??100);
-let energy=clamp(s.energy??100);
-let health=clamp(s.health??100);
-let mood=clamp(s.mood??100);
-let won=s.won??false;
-let ach={};
-if(s.ach&&typeof s.ach==='object'){
-  Object.keys(s.ach).forEach(k=>{if(ACH_KEYS.includes(k))ach[k]=s.ach[k]});
+/* ================= ЗВУКИ ================= */
+let soundEnabled = true;
+function playSound(type) {
+  if(!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if(type==='money'){osc.frequency.value=600;gain.gain.value=.05;osc.start();osc.frequency.exponentialRampToValueAtTime(1200,ctx.currentTime+.1);osc.stop(ctx.currentTime+.1);}
+    if(type==='click'){osc.frequency.value=300;gain.gain.value=.05;osc.start();osc.stop(ctx.currentTime+.05);}
+    if(type==='bad'){osc.type='sawtooth';osc.frequency.value=150;gain.gain.value=.05;osc.start();osc.stop(ctx.currentTime+.2);}
+    if(type==='upgrade'){osc.frequency.value=400;gain.gain.value=.05;osc.start();osc.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+.2);osc.stop(ctx.currentTime+.2);}
+    if(type==='win'){osc.frequency.value=500;gain.gain.value=.05;osc.start();osc.frequency.exponentialRampToValueAtTime(1000,ctx.currentTime+.3);osc.stop(ctx.currentTime+.3);}
+  } catch(e){}
 }
-let days=Number.isFinite(s.days)?s.days:1;
-let busy=false;
-let tickCount=0;
 
-const ACH_KEYS=['first1000','win','rich','rich2','rich3','lowhp','hungry','tired','sad',
-'week','month','dressed','online','home','worker','healthy','fed','rested','happy','all'];
+/* ================= АЧИВКИ (40 штук) ================= */
+// ВАЖНО: список объявлен до загрузки состояния, чтобы избежать багов!
+const ACH_LIST = {
+  m100:'💵 100$', m1k:'💰 1K$', m10k:'🤑 10K$', m50k:'💎 50K$', m100k:'👑 100K$',
+  lowhp:'💔 На грани', hungry:'🍽 Голодный', tired:'😴 Без сил', sad:'😢 На дне', happy:'😊 Счастлив',
+  d7:'📅 Неделя', d30:'📅 Месяц', d365:'📅 Год', 
+  clothes:'👕 Одет', phone:'📱 На связи', tent:'⛺ Крыша', job:'💼 Работа', 
+  pet1:'🐕 Друг', pet5:'🐕‍🦺 Лучший друг',
+  reborn1:'🔄 Новая жизнь', reborn5:'🔄 5 жизней', reborn10:'🔄 10 жизней',
+  trash50:'♻️ Эко-воин', sing10:'🎤 Звезда', work10:'🧹 Трудяга',
+  win:'🏆 Выбрался', snow:'❄️ Видел снег', rain:'🌧 Видел дождь', 
+  cas1:'🎰 Игрок', casWin:'💸 Джекпот', casLose:'💀 Всё проиграл',
+  sick:'🤒 Заболел', cured:'💊 Вылечился', buyEnergy:'⚡ Энергетик',
+  all:'👑 Легенда'
+};
 
-function save(){lsSet('bomzh',JSON.stringify({money,food,energy,health,mood,won,ach,days}))}
+/* ================= СОСТОЯНИЕ ================= */
+let s = {};
+try{const raw=lsGet('bomzh_v4');if(raw){const p=JSON.parse(raw);if(p&&typeof p==='object')s=p}}catch(e){s={}}
+let money=clampMoney(s.money??0), food=clamp(s.food??100), energy=clamp(s.energy??100), health=clamp(s.health??100), mood=clamp(s.mood??100);
+let won=s.won??false, days=Number.isFinite(s.days)?s.days:1, busy=false, tickCount=0;
+let level = Number(s.level) || 1;
+let weather = s.weather || 'clear';
+let disease = Number(s.disease) || 0;
+let pet = s.pet || { owned: false, lvl: 1 };
+let inv = s.inv || { bottles: 0, scrap: 0 };
+let ach = s.ach || {};
+let buffs = s.buffs || { energyDrink: 0 };
 
-/* ---------- лог/тост/всплывашки ---------- */
+soundEnabled = s.soundEnabled !== undefined ? s.soundEnabled : true;
+document.getElementById('soundToggle').checked = soundEnabled;
+if (s.theme === 'light') { document.body.classList.add('light'); document.getElementById('themeToggle').checked = true; }
+
+function save(){lsSet('bomzh_v4',JSON.stringify({money,food,energy,health,mood,won,ach,days,level,weather,disease,pet,inv,buffs,theme:document.body.classList.contains('light')?'light':'dark',soundEnabled}))}
+
+/* ================= ЛОГ / ВИЗУАЛ ================= */
 function log(msg){
-  const l=document.getElementById('log');
-  const d=document.createElement('div');
-  d.textContent=String(msg).slice(0,160);
-  l.prepend(d);
-  while(l.children.length>80)l.removeChild(l.lastChild);
+  const l=document.getElementById('log'), d=document.createElement('div');
+  d.textContent=String(msg).slice(0,100); l.prepend(d);
+  while(l.children.length>30)l.removeChild(l.lastChild);
 }
 let toastTimer=null;
 function toast(msg){
   const t=document.getElementById('toast');
-  t.textContent=String(msg).slice(0,120);
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),1700);
+  t.textContent=String(msg).slice(0,100); t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
 }
 function floatText(txt,color,ev){
-  const el=document.createElement('div');
-  el.className='float';el.textContent=txt;
-  if(color)el.style.color=color;
+  const el=document.createElement('div'); el.className='float'; el.textContent=txt; if(color)el.style.color=color;
   let x=window.innerWidth/2,y=window.innerHeight/2;
-  if(ev&&ev.currentTarget&&ev.currentTarget.getBoundingClientRect){
-    const r=ev.currentTarget.getBoundingClientRect();
-    x=r.left+r.width/2-14;y=r.top-4;
-  }
-  el.style.left=x+'px';el.style.top=y+'px';
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1000);
+  if(ev&&ev.currentTarget){const r=ev.currentTarget.getBoundingClientRect();x=r.left+r.width/2-20;y=r.top-10;}
+  el.style.left=x+'px'; el.style.top=y+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(),800);
 }
-function ripple(ev){
-  const b=ev&&ev.currentTarget;if(!b)return;
-  const r=document.createElement('span');r.className='rip';
-  const rect=b.getBoundingClientRect();
-  const size=Math.max(rect.width,rect.height);
-  r.style.width=r.style.height=size+'px';
-  r.style.left=(ev.clientX-rect.left-size/2)+'px';
-  r.style.top=(ev.clientY-rect.top-size/2)+'px';
-  b.appendChild(r);setTimeout(()=>r.remove(),520);
-}
+function bumpMoney(){const el=document.getElementById('moneyEl');el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),150)}
 
-/* ---------- магазин ---------- */
-const SHOP=[
-  {id:'food',label:'🍞 Еда',price:20},
-  {id:'energy',label:'☕ Кофе',price:15},
-  {id:'sleep',label:'🛏 Ночлег',price:50},
-  {id:'health',label:'💊 Аптечка',price:40},
-  {id:'soup',label:'🍲 Суп',price:30},
-  {id:'bread',label:'🥖 Хлеб',price:10},
-  {id:'energy2',label:'🍫 Шоколад',price:25},
-  {id:'clothes',label:'👕 Одежда',price:300,once:true},
-  {id:'phone',label:'📱 Телефон',price:500,once:true},
-  {id:'tent',label:'⛺ Палатка',price:800,once:true},
-  {id:'job',label:'💼 Работа',price:1000,once:true}
-];
-function renderShop(){
-  const box=document.getElementById('shop');
-  box.innerHTML='';
-  SHOP.forEach(it=>{
-    const b=document.createElement('button');
-    b.type='button';
-    const owned=it.once&&ach[it.id];
-    b.textContent=it.label+(owned?' ✓':'')+' ('+it.price+')';
-    if(owned)b.classList.add('owned');
-    b.onclick=(e)=>{ripple(e);buy(it.id,it.price,e)};
-    box.appendChild(b);
-  });
-}
-
-/* ---------- рендер ---------- */
-function render(){
-  food=clamp(food);energy=clamp(energy);health=clamp(health);mood=clamp(mood);money=clampMoney(money);
-  document.getElementById('money').textContent=money;
-  document.getElementById('foodTxt').textContent=Math.floor(food);
-  document.getElementById('energyTxt').textContent=Math.floor(energy);
-  document.getElementById('healthTxt').textContent=Math.floor(health);
-  document.getElementById('moodTxt').textContent=Math.floor(mood);
-  document.getElementById('dayTxt').textContent='📅 День '+days;
-  document.getElementById('wonTxt').textContent=won?'🏆 Победа':'';
-  setBar('foodBar','foodBarWrap',food);
-  setBar('energyBar','energyBarWrap',energy);
-  setBar('healthBar','healthBarWrap',health);
-  setBar('moodBar','moodBarWrap',mood);
-  const cnt=ACH_KEYS.filter(k=>k!=='all'&&ach[k]).length;
-  document.getElementById('achList').textContent='🏅 Ачивки: '+cnt+'/20';
+/* ================= АЧИВКИ ЛОГИКА ================= */
+function grantAch(key) {
+  if(ach[key]) return;
+  ach[key] = true;
+  toast('🏅 Ачивка: ' + ACH_LIST[key]);
+  log('🏅 Получена: ' + ACH_LIST[key]);
+  playSound('upgrade');
+  renderAchList();
   save();
 }
-function setBar(id,wrapId,val){
-  const bar=document.getElementById(id);bar.style.width=val+'%';
-  const wrap=document.getElementById(wrapId);
-  if(val<=20)wrap.classList.add('low');else wrap.classList.remove('low');
-}
-function bumpMoney(){
-  const el=document.getElementById('moneyEl');
-  el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),160);
+function checkAch() {
+  if(money>=100) grantAch('m100'); if(money>=1000) grantAch('m1k'); if(money>=10000) grantAch('m10k');
+  if(money>=50000) grantAch('m50k'); if(money>=100000) grantAch('m100k');
+  if(health<=20) grantAch('lowhp'); if(food<=10) grantAch('hungry'); if(energy<=10) grantAch('tired'); if(mood<=10) grantAch('sad'); if(mood>=100) grantAch('happy');
+  if(days>=7) grantAch('d7'); if(days>=30) grantAch('d30'); if(days>=365) grantAch('d365');
+  if(ach.clothes) grantAch('clothes'); if(ach.phone) grantAch('phone'); if(ach.tent) grantAch('tent'); if(ach.job) grantAch('job');
+  if(pet.owned) grantAch('pet1'); if(pet.lvl>=5) grantAch('pet5');
+  if(level>=2) grantAch('reborn1'); if(level>=6) grantAch('reborn5'); if(level>=11) grantAch('reborn10');
+  if(inv.bottles>=50) grantAch('trash50'); if(won) grantAch('win');
+  if(weather==='snow') grantAch('snow'); if(weather==='rain') grantAch('rain');
+  if(disease>0) grantAch('sick');
+  
+  let count = Object.keys(ach).filter(k => k !== 'all').length;
+  if(count >= 39) grantAch('all');
 }
 
-/* ---------- ачивки ---------- */
-function grantAch(key,text){
-  if(ach[key])return;
-  ach[key]=true;log(text);toast(text);
+/* ================= РЕНДЕР ================= */
+function switchTab(id, btn) {
+  playSound('click');
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function render() {
+  food=clamp(food); energy=clamp(energy); health=clamp(health); mood=clamp(mood); money=clampMoney(money); disease=clamp(disease);
+  
+  document.getElementById('money').textContent = money;
+  document.getElementById('foodTxt').textContent = Math.floor(food);
+  document.getElementById('energyTxt').textContent = Math.floor(energy);
+  document.getElementById('healthTxt').textContent = Math.floor(health);
+  document.getElementById('moodTxt').textContent = Math.floor(mood);
+  document.getElementById('dayTxt').textContent = '📅 День '+days;
+  document.getElementById('lvlBadge').textContent = 'Ур. '+level;
+  
+  let wTxt = weather==='snow'?'❄️ Снег': weather==='rain'?'🌧 Дождь': weather==='heat'?'🔥 Жара':'☀️ Ясно';
+  document.getElementById('weatherTxt').textContent = wTxt;
+  
+  document.getElementById('foodBar').style.width=food+'%';
+  document.getElementById('energyBar').style.width=energy+'%';
+  document.getElementById('healthBar').style.width=health+'%';
+  document.getElementById('moodBar').style.width=mood+'%';
+  
+  if(disease > 0) {
+    document.getElementById('diseaseStat').style.display = 'block';
+    document.getElementById('diseaseTxt').textContent = Math.floor(disease);
+    document.getElementById('diseaseBar').style.width = disease+'%';
+  } else {
+    document.getElementById('diseaseStat').style.display = 'none';
+  }
+  
+  let bText = [];
+  if(buffs.energyDrink > 0) bText.push(`⚡ Энергетик: x2 доход (${Math.ceil(buffs.energyDrink/6)} мин)`);
+  document.getElementById('buffsBox').textContent = bText.length ? bText.join(' | ') : 'Нет эффектов';
+  
+  if(pet.owned) {
+    document.getElementById('petBox').classList.add('active');
+    document.getElementById('petNo').style.display = 'none';
+    document.getElementById('petLvl').textContent = pet.lvl;
+    document.getElementById('petIncome').textContent = pet.lvl * 3;
+    document.getElementById('petPrice').textContent = pet.lvl * 500;
+  } else {
+    document.getElementById('petBox').classList.remove('active');
+    document.getElementById('petNo').style.display = 'block';
+  }
+  
   checkAch();
-}
-function checkAch(){
-  if(ach.all)return;
-  const cnt=ACH_KEYS.filter(k=>k!=='all'&&ach[k]).length;
-  if(cnt>=20){ach.all=true;log('🏆 Все ачивки собраны!');toast('🏆 Все ачивки!')}
-}
-function checkStatsAch(){
-  if(money>=1000)grantAch('first1000','🏅 Первая тысяча!');
-  if(money>=5000)grantAch('win','🏅 Выбрался с улицы!');
-  if(money>=10000)grantAch('rich','🏅 10 000 монет!');
-  if(money>=50000)grantAch('rich2','🏅 50 000 монет!');
-  if(money>=100000)grantAch('rich3','🏅 100 000 монет!');
-  if(health<=20)grantAch('lowhp','🏅 На грани.');
-  if(food<=10)grantAch('hungry','🏅 Голодный день.');
-  if(energy<=10)grantAch('tired','🏅 Без сил.');
-  if(mood<=10)grantAch('sad','🏅 На дне.');
-  if(days>=7)grantAch('week','🏅 Неделя на улице.');
-  if(days>=30)grantAch('month','🏅 Месяц выживания.');
-  if(ach.clothes)grantAch('dressed','🏅 Одёт по-человечески.');
-  if(ach.phone)grantAch('online','🏅 Снова онлайн.');
-  if(ach.tent)grantAch('home','🏅 Есть крыша.');
-  if(ach.job)grantAch('worker','🏅 Вернулся к работе.');
-  if(health>=100)grantAch('healthy','🏅 Полное здоровье.');
-  if(food>=100)grantAch('fed','🏅 Сыт.');
-  if(energy>=100)grantAch('rested','🏅 Отдохнул.');
-  if(mood>=100)grantAch('happy','🏅 Счастлив.');
+  save();
 }
 
-/* ---------- события ---------- */
-function randomEvent(){
-  const r=Math.random();
-  if(r<0.05){money=clampMoney(money+100);floatText('+100','#ffd700');log('🍀 Нашёл кошелёк! +100 монет.');bumpMoney()}
-  else if(r<0.10){health=clamp(health-10);floatText('-10 ❤','#e74c3c');log('👊 Отобрали мелочь и побили.')}
-  else if(r<0.15){food=clamp(food+20);floatText('+20 🍞','#e67e22');log('🥪 Добрый прохожий дал бутерброд.')}
-  else if(r<0.20){energy=clamp(energy-15);floatText('-15 ⚡','#3498db');log('🌧 Пошёл дождь, продрог.')}
-  else if(r<0.25){mood=clamp(mood-10);floatText('-10 😞','#9b59b6');log('😞 Кто-то обозвал.')}
-  else if(r<0.30){money=clampMoney(money+50);floatText('+50','#ffd700');log('🎁 Кто-то оставил пакет с едой и мелочью.');bumpMoney()}
-  else if(r<0.35){health=clamp(health+10);floatText('+10 ❤','#2ecc71');log('💊 Нашёл аптечку.')}
-  else if(r<0.40){energy=clamp(energy+20);floatText('+20 ⚡','#3498db');log('☕ Добрый бариста налил кофе.')}
-  else if(r<0.45){mood=clamp(mood+15);floatText('+15 😊','#9b59b6');log('😊 Ребёнок улыбнулся.')}
-  else if(r<0.50){money=clampMoney(money-20);floatText('-20','#e74c3c');log('💸 Оштрафовали.');bumpMoney()}
+/* ================= МАГАЗИН ================= */
+function renderShop() {
+  const fBox = document.getElementById('shop-food'); fBox.innerHTML='';
+  const uBox = document.getElementById('shop-upgrades'); uBox.innerHTML='';
+  const cBox = document.getElementById('shop-craft'); cBox.innerHTML='';
+  
+  const foods = [
+    {id:'food',label:'🍞 Еда',p:20}, {id:'soup',label:'🍲 Суп',p:30}, {id:'energy',label:'☕ Кофе',p:15},
+    {id:'energy2',label:'🍫 Шоколад',p:25}, {id:'health',label:'💊 Аптечка',p:40}, {id:'energyDrink',label:'🥤 Энергетик',p:150}
+  ];
+  foods.forEach(it=>{
+    const b=document.createElement('button'); b.innerHTML=it.label+'<br><span style="font-size:11px">'+it.p+' 💰</span>';
+    b.onclick=(e)=>{playSound('click');buy(it.id,it.p,e)};
+    fBox.appendChild(b);
+  });
+  
+  const upgrades = [
+    {id:'clothes',label:'👕 Одежда',p:300}, {id:'phone',label:'📱 Телефон',p:500},
+    {id:'tent',label:'⛺ Палатка',p:800}, {id:'job',label:'💼 Работа',p:1000},
+    {id:'dog',label:'🐕 Собака',p:1500}
+  ];
+  upgrades.forEach(it=>{
+    const owned = ach[it.id] || (it.id==='dog'&&pet.owned);
+    const b=document.createElement('button'); b.innerHTML=it.label+(owned?' ✓':'')+'<br><span style="font-size:11px">'+it.p+' 💰</span>';
+    if(owned) b.style.opacity='0.4';
+    b.onclick=(e)=>{playSound('click');buy(it.id,it.p,e)};
+    uBox.appendChild(b);
+  });
+  
+  const c1=document.createElement('button'); c1.innerHTML='♻️ Сдать бутылки ('+inv.bottles+' шт)<br><span style="font-size:11px">+'+(inv.bottles*5)+' 💰</span>';
+  if(inv.bottles<1) c1.disabled=true; c1.onclick=(e)=>{playSound('money');money+=inv.bottles*5;inv.bottles=0;log('Сдал бутылки!');renderShop();render()};
+  cBox.appendChild(c1);
+  
+  const c2=document.createElement('button'); c2.innerHTML='⚙️ Сдать металл ('+inv.scrap+' шт)<br><span style="font-size:11px">+'+(inv.scrap*15)+' 💰</span>';
+  if(inv.scrap<1) c2.disabled=true; c2.onclick=(e)=>{playSound('money');money+=inv.scrap*15;inv.scrap=0;log('Сдал металл!');renderShop();render()};
+  cBox.appendChild(c2);
 }
 
-/* ---------- guard ---------- */
-function guard(fn,ev){
-  if(busy)return;
-  busy=true;
-  const b=ev&&ev.currentTarget;
-  if(b){b.disabled=true;ripple(ev)}
-  try{fn()}finally{setTimeout(()=>{busy=false;if(b)b.disabled=false},180)}
+/* ================= ДЕЙСТВИЯ ================= */
+function guard(fn,ev){if(busy)return;busy=true;const b=ev&&ev.currentTarget;if(b)b.disabled=true;try{fn()}finally{setTimeout(()=>{busy=false;if(b)b.disabled=false},150)}}
+
+function getMultiplier() {
+  let m = 1 + ((level-1) * 0.10);
+  if(buffs.energyDrink > 0) m *= 2;
+  return m;
 }
 
-/* ---------- действия ---------- */
 function beg(ev){guard(()=>{
-  if(energy<5){log('Нет сил просить. Нужен отдых.');return}
-  const r=Math.random();let got=0;
-  if(r<0.5)got=Math.floor(Math.random()*5)+1;
-  else if(r<0.8)got=Math.floor(Math.random()*15)+5;
-  else if(r<0.95)got=Math.floor(Math.random()*30)+15;
-  else{log('Тебе дали 0. Прохожий отвернулся.');energy=clamp(energy-5);render();return}
-  const bonus=ach.clothes?1.5:1;
-  got=Math.floor(got*bonus);
-  money=clampMoney(money+got);energy=clamp(energy-5);mood=clamp(mood-2);
-  floatText('+'+got,'#ffd700',ev);bumpMoney();
-  log('Ты получил '+got+' монет.');
-  if(money>=5000&&!won){won=true;log('🏆 Ты накопил 5000 и выбрался с улицы. Победа!');toast('🏆 Победа!')}
-  randomEvent();render();
+  if(energy<5){log('Нет сил.');return}
+  let got=rand(1,20); got=Math.floor(got*getMultiplier()*(ach.clothes?1.5:1));
+  money=clampMoney(money+got); energy=clamp(energy-5);
+  playSound('money'); floatText('+'+got,'#ffd700',ev); log('Подали '+got);
+  randomEvent(); renderShop(); render();
 },ev)}
 
 function work(ev){guard(()=>{
-  if(energy<20){log('Слишком устал работать.');return}
-  const pay=Math.floor(Math.random()*40)+20;
-  money=clampMoney(money+pay);energy=clamp(energy-20);mood=clamp(mood-5);
-  floatText('+'+pay,'#ffd700',ev);bumpMoney();
-  log('Поработал. Заработал '+pay+' монет.');render();
+  if(energy<20){log('Устал.');return}
+  let pay=rand(20,60); pay=Math.floor(pay*getMultiplier());
+  money=clampMoney(money+pay); energy=clamp(energy-20); mood=clamp(mood-5);
+  playSound('money'); floatText('+'+pay,'#ffd700',ev); log('Заработал '+pay);
+  randomEvent(); renderShop(); render();
 },ev)}
 
 function dumpster(ev){guard(()=>{
-  if(energy<10){log('Нет сил рыться.');return}
-  energy=clamp(energy-10);
-  const r=Math.random();
-  if(r<0.3){food=clamp(food+25);floatText('+25 🍞','#e67e22',ev);log('🍞 Нашёл еду.')}
-  else if(r<0.5){money=clampMoney(money+15);floatText('+15','#ffd700',ev);log('💰 Нашёл мелочь.');bumpMoney()}
-  else if(r<0.7){health=clamp(health-5);floatText('-5 ❤','#e74c3c',ev);log('🤢 Что-то испортило здоровье.')}
-  else{log('Ничего не нашёл.')}
-  render();
+  if(energy<10){log('Нет сил.');return}
+  energy=clamp(energy-10); const r=Math.random();
+  if(r<0.3){food=clamp(food+25);log('Нашёл еду.')}
+  else if(r<0.5){let m=Math.floor(rand(10,30)*getMultiplier());money=clampMoney(money+m);playSound('money');log('Нашёл '+m);}
+  else if(r<0.7){health=clamp(health-5);playSound('bad');log('Поранился.')}
+  else{inv.scrap++; log('Нашёл металл.')}
+  renderShop(); render();
+},ev)}
+
+function scavenge(ev){guard(()=>{
+  if(energy<15){log('Нет сил.');return}
+  energy=clamp(energy-15); inv.bottles += rand(1,3);
+  if(Math.random()<0.3) inv.scrap++;
+  log('Собрал бутылки.');
+  renderShop(); render();
 },ev)}
 
 function sleepStreet(ev){guard(()=>{
-  if(energy>=100){log('Ты и так бодр.');return}
-  energy=clamp(energy+40);health=clamp(health-10);mood=clamp(mood-10);
-  floatText('+40 ⚡','#3498db',ev);
-  log('Поспал на улице. Энергия +40, здоровье -10.');render();
-},ev)}
-
-function pray(ev){guard(()=>{
-  if(energy<5){log('Нет сил.');return}
-  energy=clamp(energy-5);
-  if(Math.random()<0.3){mood=clamp(mood+20);floatText('+20 😊','#9b59b6',ev);log('🙏 Стало легче на душе.')}
-  else{log('🙏 Ничего не произошло.')}
-  render();
+  if(energy>=100){log('Ты бодр.');return}
+  energy=clamp(energy+40); health=clamp(health-10); mood=clamp(mood-10);
+  log('Поспал на улице.'); render();
 },ev)}
 
 function sing(ev){guard(()=>{
   if(energy<10){log('Нет сил петь.');return}
-  energy=clamp(energy-10);
-  const earned=Math.floor(Math.random()*25)+5;
-  money=clampMoney(money+earned);mood=clamp(mood+10);
-  floatText('+'+earned,'#ffd700',ev);bumpMoney();
-  log('🎤 Ты спел и получил '+earned+' монет.');render();
+  energy=clamp(energy-10); let earned=Math.floor(rand(5,30)*getMultiplier());
+  money=clampMoney(money+earned); mood=clamp(mood+10);
+  playSound('money'); floatText('+'+earned,'#ffd700',ev); log('Спел на '+earned);
+  renderShop(); render();
 },ev)}
 
-function buy(type,price,ev){guard(()=>{
-  if(money<price){log('Не хватает монет.');toast('Не хватает монет');return}
-  const once=['clothes','phone','tent','job'];
-  if(once.includes(type)&&ach[type]){log('Уже куплено.');toast('Уже куплено');return}
-  money=clampMoney(money-price);bumpMoney();
-  if(type==='food'){food=clamp(food+30);log('Поел. Голод снизился.')}
-  if(type==='energy'){energy=clamp(energy+40);log('Выпил кофе. Энергия выросла.')}
-  if(type==='sleep'){energy=clamp(energy+60);health=clamp(health+10);log('Поспал в ночлежке.')}
-  if(type==='health'){health=clamp(health+40);log('Подлечился.')}
-  if(type==='soup'){food=clamp(food+45);health=clamp(health+10);log('Съел суп. Тепло и сытно.')}
-  if(type==='bread'){food=clamp(food+15);log('Съел хлеб.')}
-  if(type==='energy2'){food=clamp(food+10);energy=clamp(energy+25);log('Шоколад взбодрил.')}
-  if(type==='clothes'){ach.clothes=true;log('Купил одежду. Теперь подают чаще.')}
-  if(type==='phone'){ach.phone=true;mood=clamp(mood+20);log('Купил телефон. Снова на связи.')}
-  if(type==='tent'){ach.tent=true;energy=clamp(energy+20);log('Купил палатку. Теперь есть крыша.')}
-  if(type==='job'){ach.job=true;money=clampMoney(money+50);log('Устроился на работу. +50 монет сразу.')}
-  renderShop();render();
-},ev)}
+/* ================= ИВЕНТЫ ================= */
+function randomEvent(){
+  if(pet.owned && Math.random() < 0.5) return; // Собака защищает
+  const r=Math.random();
+  if(r<0.05){let m=Math.floor(100*getMultiplier());money=clampMoney(money+m);playSound('money');log('🍀 Кошелёк! +'+m);}
+  else if(r<0.10){health=clamp(health-10);playSound('bad');log('👊 Побили.');}
+  else if(r<0.15){food=clamp(food+20);log('🥪 Бутерброд.');}
+  else if(r<0.20){let m=Math.floor(500*getMultiplier());money=clampMoney(money+m);playSound('win');log('🌟 ЗОЛОТО! +'+m);}
+  else if(r<0.25){disease=clamp(disease+20);log('🤒 Ты подхватил болезнь!');}
+  else if(r<0.30){money=clampMoney(money-rand(10,50));playSound('bad');log('💸 Штраф.');}
+}
 
-function resetGame(ev){guard(()=>{
-  try{lsDel('bomzh')}catch(e){}
-  location.reload();
-},ev)}
-
-/* ---------- таймеры ---------- */
-setInterval(()=>{
-  food=clamp(food-1);
-  energy=clamp(energy-0.5);
-  mood=clamp(mood-0.3);
-  if(food<=0)health=clamp(health-2);
-  if(health<=0){
-    money=0;food=100;energy=100;health=100;mood=100;
-    log('💀 Ты потерял сознание. Тебя обобрали. Начинаешь заново.');
-    toast('💀 Тебя обобрали!');
+/* ================= КАЗИНО ================= */
+function playCasino(game, bet, ev) {
+  if (bet <= 0) { toast('Нечего ставить!'); return; }
+  if(money < bet) { toast('Мало денег!'); playSound('bad'); return; }
+  
+  money -= bet;
+  let win = false, mult = 0;
+  
+  if(game==='slot') {
+    let r = Math.random();
+    if(r<0.05) { win=true; mult=10; log('🎰 ДЖЕКПОТ! x10'); }
+    else if(r<0.3) { win=true; mult=2; log('🎰 Выигрыш x2'); }
+    else log('🎰 Проигрыш');
+  } else if(game==='dice') {
+    let my = rand(1,6), his = rand(1,6);
+    if(my > his) { win=true; mult=2; log(`🎲 Ты: ${my}, Казино: ${his} — Победа!`); }
+    else log(`🎲 Ты: ${my}, Казино: ${his} — Проигрыш`);
+  } else if(game==='shells') {
+    if(Math.random()<0.4) { win=true; mult=2.5; log('🥥 Нашел шарик! x2.5'); }
+    else log('🥥 Не угадал.');
+  } else if(game==='allin') {
+    if(Math.random()<0.1) { win=true; mult=20; log('💀 ВА-БАНК УДАЛСЯ! x20'); }
+    else { log('💀 Всё проиграно.'); money=0; }
   }
-  tickCount++;
-  if(tickCount%12===0){days+=1;log('📅 День '+days+'.')}
-  render();
-  checkStatsAch();
-},10000);
+  
+  if(win) {
+    let prize = Math.floor(bet * mult);
+    money += prize;
+    playSound('win');
+    toast('Выигрыш: +' + prize);
+    floatText('+'+prize, '#ffd700', ev);
+  } else {
+    playSound('bad');
+    if (money <= 0) { grantAch('casLose'); }
+  }
+  
+  renderShop(); render();
+}
 
-/* ---------- старт ---------- */
-renderShop();
-render();
-checkStatsAch();
-log('Игра началась. Проси милостыню и выживай.');
+/* ================= ПОКУПКИ ================= */
+function buy(type, price, ev) {
+  guard(()=>{
+    if(money < price) { toast('Мало монет'); playSound('bad'); return; }
+    const once = ['clothes','phone','tent','job','dog'];
+    if(once.includes(type) && (ach[type] || (type==='dog'&&pet.owned))) { toast('Уже есть'); return; }
+    
+    money -= price;
+    
+    if(type==='food') food=clamp(food+30);
+    else if(type==='soup') { food=clamp(food+45); health=clamp(health+10); }
+    else if(type==='energy') energy=clamp(energy+40);
+    else if(type==='energy2') { food=clamp(food+10); energy=clamp(energy+25); }
+    else if(type==='health') { health=clamp(health+40); disease=clamp(disease-30); if(disease===0) grantAch('cured'); }
+    else if(type==='energyDrink') { buffs.energyDrink = 300; log('Энергетик выпит! x2 доход на 5 минут.'); grantAch('buyEnergy'); }
+    else if(type==='clothes') ach.clothes=true;
+    else if(type==='phone') { ach.phone=true; mood=clamp(mood+20); }
+    else if(type==='tent') { ach.tent=true; energy=clamp(energy+20); }
+    else if(type==='job') { ach.job=true; money=clampMoney(money+50); }
+    else if(type==='dog') { pet.owned=true; log('🐕 Жуча теперь с тобой!'); }
+    
+    playSound('upgrade'); renderShop(); render();
+  }, ev);
+}
+
+function upgradePet(ev) {
+  let cost = pet.lvl * 500;
+  if(money < cost) { toast('Мало монет'); return; }
+  money -= cost; pet.lvl++;
+  playSound('upgrade'); toast('Жуча прокачана до ур.'+pet.lvl);
+  renderShop(); render();
+}
+
+/* ================= НАСТРОЙКИ И СБРОС ================= */
+function openSettings() { playSound('click'); renderAchList(); document.getElementById('settingsModal').classList.add('show'); }
+function closeSettings() { document.getElementById('settingsModal').classList.remove('show'); }
+function toggleTheme() { document.body.classList.toggle('light'); save(); }
+function toggleSound() { soundEnabled = document.getElementById('soundToggle').checked; save(); if(soundEnabled) playSound('money'); }
+function renderAchList() {
+  const box = document.getElementById('achListBox'); box.innerHTML='';
+  let c=0;
+  Object.keys(ACH_LIST).forEach(k => {
+    if(k==='all') return;
+    const span = document.createElement('span');
+    span.className = 'ach-item' + (ach[k]?' unlocked':'');
+    span.textContent = ACH_LIST[k];
+    box.appendChild(span);
+    if(ach[k]) c++;
+  });
+  document.getElementById('achCount').textContent = c;
+}
+function resetGame(ev){
+  try{lsDel('bomzh_v4')}catch(e){} location.reload();
+}
+
+/* ================= РЕИНКАРНАЦИЯ ================= */
+function openRebirth() {
+  document.getElementById('xpModalTxt').textContent = level;
+  document.getElementById('rebirthModal').classList.add('show');
+}
+function doRebirth() {
+  level++;
+  money=0; food=100; energy=100; health=100; mood=100; disease=0; days=1; won=false; inv={bottles:0,scrap:0};
+  document.getElementById('rebirthModal').classList.remove('show');
+  log('🔄 Новая жизнь! Уровень: '+level); playSound('upgrade');
+  renderShop(); render();
+}
+
+/* ================= ЦИКЛ ИГРЫ ================= */
+setInterval(()=>{
+  food=clamp(food-1); energy=clamp(energy-0.5); mood=clamp(mood-0.3);
+  if(buffs.energyDrink > 0) buffs.energyDrink--;
+  
+  if(weather==='snow') { energy=clamp(energy-0.5); }
+  if(weather==='heat') { food=clamp(food-0.5); }
+  if(weather==='rain') { mood=clamp(mood-0.2); }
+  
+  if(food<=0) health=clamp(health-2);
+  if(disease>0) health=clamp(health-1);
+  
+  if(health<=0) {
+    money=Math.floor(money*0.5); food=100; health=100; disease=0;
+    playSound('bad'); log('💀 Ты упал в обморок. Потерял половину денег.'); toast('💀 Обморок!');
+  }
+  
+  if(pet.owned && tickCount%2===0) {
+    money=clampMoney(money + (pet.lvl*3));
+    if(Math.random()<0.1) log('🐕 Жуча принесла монетку.');
+  }
+  
+  tickCount++;
+  if(tickCount%12===0) { days++; log('📅 День '+days); }
+  
+  if(tickCount%20===0) {
+    let r = Math.random();
+    if(r<0.4) weather='clear'; else if(r<0.6) weather='rain'; else if(r<0.8) weather='snow'; else weather='heat';
+  }
+  
+  render();
+}, 10000);
+
+/* ================= СТАРТ ================= */
+renderShop(); render(); renderAchList(); log('Игра обновлена до v4.1! Ошибки исправлены.');
 </script>
 </body>
   </html>
